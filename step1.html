@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .spinner-control {
+            display: block;
+            margin: 20px auto;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        .navigate-button {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navigate-button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <p id="description">Introduce the number of movies to compare. Select between 4 and 6 movies.</p>
+        <input type="number" class="spinner-control" id="spinner" min="4" max="6" step="1" value="4">
+        <button id="next" class="navigate-button" onclick="goToElementsPage()">Next</button>
+    </div>
+
+    <script>
+
+        const translations = {
+            en: {
+                description: "Introduce the number of movies to compare. Select between 4 and 6 movies.",
+                next: "Next"
+            },
+            es: {
+                description: "Introduce el número de películas a comparar. Puedes escoger entre 4 y 6 películas",
+                next: "Siguiente"
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            changeLanguage(savedLanguage);
+        });
+
+        function changeLanguage(language) {
+            document.getElementById('description').textContent = translations[language].description;
+            document.getElementById('next').textContent = translations[language].next;
+        }
+
+        function goToElementsPage() {
+            const spinnerValue = document.getElementById('spinner').value;
+            localStorage.setItem('n', spinnerValue);
+            window.location.href = `step2.html?count=${spinnerValue}`;
+        }
+
+
+    </script>
+</body>
+</html>

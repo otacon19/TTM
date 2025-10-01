@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTM comparison</title>
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: justify;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+           
+        }
+
+        .container-comp {
+            display: grid;
+            grid-template-columns: repeat(19, 1fr); /* 19 columnas */
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+            overflow-y: auto;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+        }
+
+        p {
+            color: #666;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .button-container {
+            text-align: center;
+            justify-content: center;
+        }
+
+        .navigate-button {
+            margin-top: 10px;
+            width: 200px;
+            height: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .scale-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .selected {
+            background-color: blue !important;
+        }
+
+        #title {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .text-extreme {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .navigate-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .navigate-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+          
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Compare movies</h1>
+        <p id="description">The movies are compared in pairs using values between <strong>1</strong> and <strong>9</strong> (you can find out the name of the movie by placing your mouse over the word 'Movie'). You should provide your preferences over the movies considering the following:</p>
+            <p id="red" style="color:red;">If you prefer the movie on the left, choose a value using the red scale.</p> 
+            <p id="green" style="color:green;">If you prefer the movie on the right, choose a value using the green scale.</p>
+            <p id="scale">Notice 9 means <em>'Extremely much better"</em>, 1 means <em>"Equal"</em> and the remainder values represent intermediate values of preference.</p>
+        <div class = "container-comp" id="comparison-container"></div>
+        <div class="button-container">
+            <button id="roundButton" class="navigate-button" onclick="TTM(round++)" disabled="true">Round</button>
+            <button id="nextButton" class="navigate-button" onclick="goToNextStep()" disabled="true">Next step</button>
+        </div>
+    </div>
+
+    <script>
+
+        const translations = {
+            en: {
+                title:"Compare movies",
+                description: "The movies are compared in pairs using values between <strong>1</strong> and <strong>9</strong> (you can find out the name of the movie by placing your mouse over the word 'Movie'). You should provide your preferences over the movies considering the following:",
+                red:"If you prefer the movie on the left, choose a value using the red scale.",
+                green:"If you prefer the movie on the right, choose a value using the green scale.",
+                scale:"Notice 9 means <em>'Extremely much better</em>,1 means <em>'Equal'</em> and the remainder values represent intermediate values of preference.",
+                roundButton: "Next round",
+                nextButton: "Next phase",
+            },
+            es: {
+                title:"Comparar películas",
+                description: "Las películas se comparan por pares usando valores entre <strong>1</strong> y <strong>9</strong> (puedes ver el nombre de la película si colocas el cursor sobre la palabra 'Movie'). Debes de comparar las películas teniendo en cuenta lo siguiente:",
+                red:"Si prefieres la película de la izquierda, elige un valor de la escala en color rojo. ",
+                green:"Si prefieres la película de la derecha, elige un valor de la escala en color verde",
+                scale:"Ten en cuenta que 9 significa <em>'Extremadamente mucho mejor'</em>, 1 significa <em>'Igual'</em> y el resto de valores representan valores intermedios de preferencia.",
+                roundButton: "Siguiente ronda",
+                nextButton: "Siguiente fase",
+            }
+        };
+
+        function changeLanguage(language) {
+            document.getElementById('title').textContent = translations[language].title;
+            document.getElementById('description').innerHTML = translations[language].description;
+            document.getElementById('red').textContent = translations[language].red;
+            document.getElementById('green').textContent = translations[language].green;
+            document.getElementById('scale').innerHTML = translations[language].scale;
+            document.getElementById('roundButton').textContent = translations[language].roundButton;
+            document.getElementById('nextButton').textContent = translations[language].nextButton;
+        }
+        
+        const buttonValues = [9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+        let selectedButtons = { };
+        
+        let textValues = localStorage.getItem('movies').split(',');
+        let round = 0;
+
+        const n = textValues.length;    
+        const M_fpr = new Array(n).fill(null).map(() => new Array(n).fill(0));
+        for (let i = 0; i < n; i++) { M_fpr[i][i] = 0.5; }
+        const M_saaty = new Array(n).fill(null).map(() => new Array(n).fill("1"));
+
+        const comp = comparisons(n);
+        let winList = Array.from({ length: n }, (_, index) => index);
+        let newWinList = [];
+        
+        let L = new Array(n);
+        for (let i = 0; i < n; i++) { L[i] = new Array(3).fill(0.0)};
+  
+        function half(n) {
+            const result = new Array(2);
+            result[0] = Math.floor(n / 2);
+            result[1] = n % 2;
+            return result;
+        }
+
+        function comparisons(n) {
+            const nRounds = Math.ceil(Math.log2(n));
+            const comp = new Array(nRounds).fill(0);
+            let round = 0;
+
+            let _half = half(n);
+            let C = _half[0];
+            let R = _half[1];
+
+            comp[round] = C;
+            while(!(C == 1 && R == 0)) {
+                round++;
+                _half = half(C+R);
+                C = _half[0];
+                R = _half[1];
+                comp[round] = C;
+            }
+            
+            return comp.map(Math.floor);
+        }
+
+        const createButtonsRow = (rowIndex, fighterLeft, fighterRight) => {
+            const comparisonContainer = document.getElementById('comparison-container');
+
+            indexLeft = textValues.indexOf(fighterLeft);
+            const leftTextNode = document.createElement('div');
+            leftTextNode.classList.add('text-extreme');
+            leftTextNode.textContent = `Movie ${indexLeft + 1}`;
+            leftTextNode.title = `${fighterLeft}`;
+            comparisonContainer.appendChild(leftTextNode);
+
+            buttonValues.forEach((value, index) => {
+                const button = document.createElement('button');
+                button.textContent = value;
+                button.classList.add('scale-button');
+
+                if (index < 8) {
+                    button.classList.add('red');
+                } else if (index > 8) {
+                    button.classList.add('green');
+                }
+
+                button.addEventListener('click', () => {
+                    if (selectedButtons[rowIndex]) {
+                        selectedButtons[rowIndex].classList.remove('selected');
+                    }
+
+                    button.classList.add('selected');
+                    selectedButtons[rowIndex] = button;
+
+                    const selectedCount = Object.keys(selectedButtons).filter(key => selectedButtons[key] !== null).length;
+                    const totalRows = Object.keys(selectedButtons).length;
+
+                    if(selectedCount === totalRows) {
+                        const roundButton = document.getElementById('roundButton');
+                        const nextButton = document.getElementById('nextButton');
+                        
+                        if(round + 1 === comp.length) {
+                            roundButton.disabled = true;
+                            nextButton.disabled = false;
+                        } else {
+                            roundButton.disabled = false;
+                        }
+                    }
+                });
+
+                comparisonContainer.appendChild(button);
+            });
+
+            indexRight = textValues.indexOf(fighterRight);
+            const rightTextNode = document.createElement('div');
+            rightTextNode.classList.add('text-extreme');
+            rightTextNode.textContent = `Movie ${indexRight + 1}`;
+            rightTextNode.title = `${fighterRight}`;
+            comparisonContainer.appendChild(rightTextNode);
+        }
+
+        function transformScale(value) {
+            return 0.5 + 0.5 * Math.log(value)/Math.log(9);
+        }
+   
+        let Lindex = 0;
+        let nRow = 0;
+
+        function TTM(round) {
+
+            const comparisonContainer = document.getElementById('comparison-container');
+
+            if(round < comp.length) {
+
+                let index = 0;
+                let m;
+        
+                for (let i = 0; i < comp[round]; i++) {
+
+                    m = selectedButtons[nRow].textContent;
+        
+                    if (selectedButtons[nRow].classList.contains('red')) {
+                        M_saaty[winList[index]][winList[index + 1]] = m;
+                        M_saaty[winList[index + 1]][winList[index]] = "1/" + m;
+                        M_fpr[winList[index]][winList[index+1]] = transformScale(parseFloat(m));
+                        M_fpr[winList[index + 1]][winList[index]] = 1 - M_fpr[winList[index]][winList[index+1]];
+                        
+                        L[Lindex][0] = winList[index];
+                        L[Lindex][1] = winList[index + 1];
+                        
+                        newWinList.push(winList[index]);
+                    } else {
+                        M_saaty[winList[index]][winList[index+1]] = "1/" + m;
+                        M_saaty[winList[index + 1]][winList[index]] = m;
+                        M_fpr[winList[index]][winList[index+1]] = transformScale(parseFloat(1 / m));
+                        M_fpr[winList[index + 1]][winList[index]] = 1 - M_fpr[winList[index]][winList[index+1]];
+                        
+                        L[Lindex][0] = winList[index + 1];
+                        L[Lindex][1] = winList[index];
+                        
+                        newWinList.push(winList[index + 1]);
+                    }
+                        
+                    L[Lindex][2] = transformScale(parseFloat(m));
+
+                    index += 2;
+                    Lindex++;
+                    nRow++;
+                }
+
+                if(winList.length % 2 == 1) {
+                    newWinList.push(winList[winList.length-1]);
+                }
+
+                winList = newWinList;
+                newWinList = [];
+                    
+                const newRows = Math.floor(winList.length / 2);
+                let totalRows = Object.keys(selectedButtons).length;
+                
+                for (let j = 0; j < newRows; j++) {
+                    selectedButtons[totalRows] = null;
+                    createButtonsRow(totalRows, textValues[winList[2 * j]], textValues[winList[2 * j + 1]]);
+                    totalRows++;
+                }
+
+                const selectedCount = Object.keys(selectedButtons).filter(key => selectedButtons[key] !== null).length;
+                const roundButton = document.getElementById('roundButton');
+                if(selectedCount != totalRows) {
+                    roundButton.disabled = true;
+                }
+            }
+         }
+
+        function goToNextStep() {
+
+            TTM(round++);
+            L[Lindex][0] = winList[winList.length-1]
+            L[Lindex][1] = winList[winList.length-1];
+            L[Lindex][2] = 0.5;
+
+            const matrixText = L.map(row => row.join(' ')).join(';') + '\n';
+            localStorage.setItem('matrixL', matrixText);
+
+            //http://localhost:5501/save-matrixL
+           /* fetch('/save-matrixL', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ L })
+            })
+            .then(response => response.text())
+            .then(data => { console.log('Success:', data); })
+            .catch((error) => { console.error('Error:', error); });*/
+
+            const matrixFPRJSON = JSON.stringify(M_fpr);
+            const matrixSaatyJSON = JSON.stringify(M_saaty);
+            const encodedFPRMatrix = encodeURIComponent(matrixFPRJSON);
+            const encodedSaatyMatrix = encodeURIComponent(matrixSaatyJSON);
+
+            window.location.href = `step4.html?matrixFPR=${encodedFPRMatrix}&matrixSaaty=${encodedSaatyMatrix}`;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            changeLanguage(savedLanguage);
+
+            for (let i = 0; i < comp[0]; i++) {
+                selectedButtons[i] = null;
+                createButtonsRow(i, textValues[2 * i], textValues[2 * i + 1]);
+            }
+        });
+
+    </script>
+</body>
+</html>

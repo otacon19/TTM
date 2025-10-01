@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTM comparison</title>
+    <style>
+        body, html {
+            font-family: 'Lato', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            text-align: justify;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1600px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+        }
+
+        p {
+            color: #666;
+            font-size: 1.0rem;
+            margin-top: 10px;
+        }
+
+        .navigate-button {
+            width: 200px;
+            height: 50px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .navigate-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .navigate-button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%; 
+            max-width: 500px; 
+            padding: 20px;
+        }
+
+        .column .title {
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        .column p {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .row strong {
+            text-align: right;
+            padding-right: 10px;
+            font-weight: bold;
+        }
+
+        .row input {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+
+        #title {
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .satisfaction-slider {
+            width: 300px;
+        }
+        
+        .satisfaction-level {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+          
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">Preferences values</h1>
+        <p id="description">Here you can see the preference values of each of the movies obtained from your comparisons. We would like to know if you think the values adequately represent your preferences about the movies and to what degree. Keep in mind that the higher the value the greater your preference for the movie.</p>
+            <div class="main-container" id="main-container"> </div>
+            <div class="column" id="column">
+            </div>
+            <div class="slider-container">
+                <p id="preference">How satisfied are you with the preference values?</p>
+                <input type="range" id="satisfactionSlider" class="satisfaction-slider" min="1" max="5" step="1" value="3" oninput="updateSatisfactionLevel()">
+                <div class="satisfaction-level" id="satisfactionLevel">Satisfaction Level:</div>
+            </div>
+            <p><center><button class="navigate-button" id="sendButton" onclick="saveScores(scoresTTM)">Send</button></center></p>
+    <script>
+
+        const translations = {
+            en: {
+                title:"Preferences values",
+                description: "Here you can see the preference values of each of the movies obtained from your comparisons. We would like to know if you think the values adequately represent your preferences about the movies and to what degree. Keep in mind that the higher the value the greater your preference for the movie.",
+                preference:"How satisfied are you with the preference values?",
+                satisfactionLevel:"Satisfaction degree: ",
+                sendButton: "Send",
+            },
+            es: {
+                title:"Valores de preferencia",
+                description: "A continuación puede ver los valores de preferencia de cada película obtenidos a partir de sus comparaciones. Nos gustaría saber si los valores representan adecuadamente sus preferencias y en qué grado. Tenga en cuenta que, cuanto mayor es el valor, mayor es la preferencia sobre la película",
+                preference:"¿Cómo de satisfecho está con los valores de preferencia?",
+                satisfactionLevel:"Grado de satisfacción: ",
+                sendButton: "Enviar",
+            }
+        };
+
+        const satisfactionLevels = {
+            en: {
+                1: "Very bad",
+                2: "Bad",
+                3: "Neutral",
+                4: "Good",
+                5: "Very good"
+            },
+            es: {
+                1: "Muy malo",
+                2: "Malo",
+                3: "Medio",
+                4: "Bueno",
+                5: "Muy bueno"
+            }
+        };
+
+        function changeLanguage(language) {
+            document.getElementById('title').textContent = translations[language].title;
+            document.getElementById('description').textContent = translations[language].description;
+            document.getElementById('preference').textContent = translations[language].preference;
+            document.getElementById('sendButton').textContent = translations[language].sendButton;
+            updateSatisfactionLevel();
+        }
+        
+        let scoresTTM;
+        let preference;
+
+        const n = Number(localStorage.getItem('n'));      
+        const movies = localStorage.getItem('movies');
+        
+        function stringToMatrix(matrixText) {
+            const trimmedText = matrixText.trim();
+            const rows = trimmedText.split(';');
+            const matrix = rows.map(row => row.split(' ').map(Number));
+            return matrix;
+        }
+
+        function updateSatisfactionLevel() {
+            const language = localStorage.getItem('language');
+            const sliderValue = document.getElementById("satisfactionSlider").value;
+            document.getElementById("satisfactionLevel").textContent = translations[language].satisfactionLevel + satisfactionLevels[language][sliderValue];
+        }
+
+        function generateFPR(L) {
+
+            let A = new Array(n).fill(null).map(() => new Array(n).fill(0));
+            let N = new Array(n).fill(null).map(() => new Array(n).fill(0));
+
+            for (let i = 0; i < n; i++) {
+                A[i][i] = 0.5;
+                N[i][i] = 1;
+            }
+
+            for (let i = 0; i < n; i++) {
+                const rowIndex1 = Math.floor(L[i][0]);
+                const rowIndex2 = Math.floor(L[i][1]);
+                const value = L[i][2];
+
+                A[rowIndex1][rowIndex2] = value;
+                A[rowIndex2][rowIndex1] = 1 - value;
+                N[rowIndex1][rowIndex2] = 1;
+                N[rowIndex2][rowIndex1] = 1;
+            }
+
+            // Select the last winner
+            let w = Math.floor(L[n-2][0]);    
+            let li = 0;
+            let index1 = 0;
+
+            for (let i = 0; i < n - 1; i++) {
+
+                li = Math.floor(L[n - 2 - i][1]);
+                index1 = Math.floor(L[n - 2 - i][0]);
+
+                if (N[w][li] === 0) {
+                    A[w][li] = A[w][index1] + A[index1][li] - 0.5;
+                    A[li][w] = 1 - A[w][li];
+                    N[w][li] = 1;
+                    N[li][w] = 1;
+                }
+            }
+
+            for (let i = 0; i < n - 1; i++) {
+                for (let j = i + 1; j < n; j++) {
+                    if (N[i][j] === 0) {
+                        A[i][j] = A[i][w] + A[w][j] - 0.5;
+                        A[j][i] = 1 - A[i][j];
+                        N[i][j] = 1;
+                        N[j][i] = 1;
+                    }
+                }
+            }
+
+            return A;
+        }
+
+        function calculateScores(matrix) {
+            return matrix.map(row => {
+                const sum = row.reduce((acc, val) => acc + val, 0);
+                return Math.round(sum / row.length * 100) / 100;
+            });
+        }
+ 
+        document.addEventListener("DOMContentLoaded", function() {
+            const savedLanguage = localStorage.getItem('language') || 'en';
+            changeLanguage(savedLanguage);
+
+            const container = document.getElementById('main-container');
+            const column = document.getElementById('column');
+
+            const moviesValues = movies.split(',');
+            
+            const L_string = localStorage.getItem('matrixL');
+            const L_matrix = stringToMatrix(L_string);
+            
+            const A = generateFPR(L_matrix);
+            scoresTTM = calculateScores(A);
+
+            for (let i = 0; i < moviesValues.length; i++) {
+                    
+                const row = document.createElement('div');
+                row.classList.add('row');
+                    
+                const movieTextNode = document.createElement('strong');
+                movieTextNode.textContent = moviesValues[i];
+                row.appendChild(movieTextNode);
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.disabled = true;
+                input.className = 'text-box';
+                input.value = scoresTTM[i];
+                     
+                row.appendChild(input);
+                column.appendChild(row);      
+            }
+            
+            container.appendChild(column);
+        });
+
+
+        //http://localhost:5501/save-scores
+        function saveScores(scoresTTM) {
+            const satisfactionSlider = document.getElementById('satisfactionSlider');
+            let degree = satisfactionSlider.value;
+            let user_name = localStorage.getItem('user_name');
+
+            fetch('/save-scores', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_name, scoresTTM, degree })
+            })
+            .then(response => response.text())
+            .then(data => { console.log('Success:', data); })
+            .catch((error) => { console.error('Error:', error); });
+
+            window.location.href = `step5.html`;
+        }
+
+    </script>
+</body>
+</html>
