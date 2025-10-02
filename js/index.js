@@ -20,7 +20,9 @@
         movies_number: "Number of movies",
         step2_description: "Introduce the name of the movies.",
         movies_label: "Movies",
-        movie_placeholder: "Movie {i}"
+        movie_placeholder: "Movie {i}",
+        step3_choose_preferred: "Choose which movie you prefer (left or right). Then add 0–50 cards to express how strong that preference is. If you do not choose and leave 0 cards, it's a tie.",
+        
       },
       es: {
         title: "Tournament Tree Model · Encuesta",
@@ -34,7 +36,8 @@
         movies_number: "Número de películas",
         step2_description: "Introduce el nombre de las películas.",
         movies_label: "Películas",
-        movie_placeholder: "Película {i}"
+        movie_placeholder: "Película {i}",
+        step3_choose_preferred: "Elige qué película prefieres (izquierda o derecha). Después añade entre 0 y 50 cartas para indicar la intensidad. Si no eliges y dejas 0 cartas, es un empate.",
       },
     };
   

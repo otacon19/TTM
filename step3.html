@@ -5,54 +5,54 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tournament Tree Model · Paso 3</title>
 
-  <!-- Tipografías + estilos comunes -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 
   <meta name="theme-color" content="#3498db" />
 
-  <!-- Estilos específicos Step 3 -->
   <style>
-    .pairs-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
-      margin: 16px 0 20px;
-    }
+    .pairs-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin: 16px 0 20px; }
 
+    /* Cada comparación ahora es solo una columna centrada */
     .pair-row {
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 14px;
+      grid-template-rows: auto auto auto;
+      gap: 12px;
+      justify-items: center;
       align-items: start;
     }
 
-    .movie-col {
-      display: grid;
-      grid-template-rows: auto auto auto auto;
+    .pref-choices { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .pref-choices label {
+      display: inline-flex;
+      align-items: center;
       gap: 8px;
-      align-items: start;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      border-radius: 999px;
+      padding: 6px 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+      cursor: pointer;
+      font-size: 14px;
     }
+    .pref-choices input[type="radio"] { accent-color: var(--primary); }
+    .movie-chip { cursor: help; } /* cursor de ayuda para indicar tooltip */
 
-    .movie-label { font-weight: 700; text-align: center; }
-    .movie-name { color: var(--muted); font-size: 14px; text-align: center; }
-
-    /* Marco del mazo: apilado compacto dentro del contenedor */
+    /* Marco del mazo más ancho */
     .card-pile {
       position: relative;
-      width: 240px;
-      height: 160px;
+      width: 600px;     /* antes: 240px */
+      height: 180px;    /* un poco más alto */
       background: #f9fafb;
       border: 1px dashed #d1d5db;
       border-radius: 12px;
       padding: 8px;
       overflow: hidden; /* no salirse del marco */
-      margin-inline: auto;
     }
 
     .card-tile {
       position: absolute;
-      width: 90px; height: 128px; /* cartas más grandes */
+      width: 90px; height: 128px;
       border-radius: 10px;
       background: #fff;
       border: 1px solid #e5e7eb;
@@ -65,50 +65,32 @@
       border-radius: 8px;
       background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9));
     }
-    .card-rank, .card-suit {
-      position: absolute;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 1;
-    }
+    .card-rank, .card-suit { position: absolute; font-size: 14px; font-weight: 700; line-height: 1; }
     .card-rank { top: 6px; left: 8px; }
     .card-suit { bottom: 6px; right: 8px; transform: rotate(180deg); }
-
-    /* Colores por palo */
     .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
     .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
 
-    .controls { display: flex; justify-content: center; gap: 8px; }
-    .ctrl-btn {
-      width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db;
-      background: #fff; cursor: pointer; font-weight: 700;
-      box-shadow: 0 1px 2px rgba(0,0,0,.06);
-    }
-    .ctrl-input {
-      width: 72px; height: 36px; text-align: center;
-      border-radius: 8px; border: 1px solid #d1d5db;
-    }
-
-    .pair-vs { font-weight: 700; color: var(--muted); align-self: center; }
+    .controls { display: flex; gap: 8px; align-items: center; justify-content: center; }
+    .ctrl-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .ctrl-input { width: 72px; height: 36px; text-align: center; border-radius: 8px; border: 1px solid #d1d5db; }
 
     .button-row { display: flex; gap: 12px; justify-content: center; }
     .navigate-button { width: 220px; height: 48px; }
 
     @media (max-width: 520px) {
-      .card-pile { width: 200px; height: 140px; }
+      .card-pile { width: 300px; height: 160px; }
       .card-tile { width: 80px; height: 114px; }
     }
   </style>
 </head>
 <body>
-  <!-- Logo fijo fuera de la tarjeta -->
   <div class="site-logo">
     <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
       <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
     </a>
   </div>
 
-  <!-- Selector de idioma -->
   <div class="lang-switch" role="group" aria-label="Language selector">
     <button type="button" id="btn-en" title="English" aria-label="English">
       <img src="img/english.png" alt="English flag" />
@@ -118,10 +100,9 @@
     </button>
   </div>
 
-  <!-- Contenido principal -->
   <main class="card" role="main">
-    <!-- Sin título H1 dentro de la tarjeta -->
     <p id="description" class="help" data-i18n="step3_description"></p>
+    <p id="choose" class="help" data-i18n="step3_choose_preferred"></p>
     <p id="hint" class="help" data-i18n="step3_cards_hint"></p>
 
     <div class="pairs-grid" id="pairsGrid"></div>
@@ -132,24 +113,19 @@
     </div>
   </main>
 
-  <!-- Lógica común (i18n + UX) -->
   <script src="js/index.js"></script>
   <script>
-    // --- Paso 3 con cartas apiladas y exclusividad por pareja ---
     let round = 0;
     const textValues = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
     const n = textValues.length;
 
-    // Matrices
     const M_fpr = Array.from({length: n}, () => Array.from({length: n}, () => 0));
     for (let i = 0; i < n; i++) M_fpr[i][i] = 0.5;
     const M_saaty = Array.from({length: n}, () => Array.from({length: n}, () => '1'));
 
-    // Registro tipo L (ganador, perdedor, intensidad)
     let L = Array.from({length: n}, () => Array(3).fill(0.0));
     let Lindex = 0;
 
-    // Árbol de eliminaciones por rondas
     function half(x){ return [Math.floor(x/2), x % 2]; }
     function comparisons(n){
       const nRounds = Math.ceil(Math.log2(n));
@@ -163,15 +139,13 @@
     let winList = Array.from({length: n}, (_, i) => i);
     let newWinList = [];
 
-    // Estado por fila: {leftCount, rightCount}
-    const rowsState = {};
+    const rowsState = {}; // {pref: 'left'|'right'|null, count: number}
 
     function labelForIndex(idx){
       const tmpl = (window.TTM?.t('movie_label')) || 'Movie {i}';
       return tmpl.replace('{i}', String(idx+1));
     }
 
-    // Generación de cartas variadas
     const SUITS = [
       {s: '♠', cls: 'suit-black'},
       {s: '♣', cls: 'suit-black'},
@@ -187,7 +161,6 @@
       const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
       const rank = RANKS[Math.floor(Math.random()*RANKS.length)];
       div.classList.add(suit.cls);
-
       const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
       const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
       face.append(rEl, sEl); div.appendChild(face);
@@ -196,13 +169,13 @@
 
     function renderPile(container, count){
       container.innerHTML = '';
-      const MAX_CARDS = 50; // límite superior
+      const MAX_CARDS = 50;
       const capped = Math.min(MAX_CARDS, Math.max(0, parseInt(count||'0',10)));
 
-      const PADDING = 8;
+      const PADDING = 12;
       const CARD_W = 90, CARD_H = 128;
-      const STEP_X = 18;   // solapamiento horizontal
-      const STEP_Y = 6;    // solapamiento vertical
+      const STEP_X = 10;  // más paso horizontal (más cartas en una fila visual)
+      const STEP_Y = 6;   // solapamiento vertical
 
       const innerW = container.clientWidth - 2*PADDING;
       const innerH = container.clientHeight - 2*PADDING;
@@ -227,144 +200,122 @@
 
     function buildRow(rowIndex, leftIdx, rightIdx){
       const grid = document.getElementById('pairsGrid');
-      const row = document.createElement('div');
+      const row  = document.createElement('div');
       row.className = 'pair-row';
 
-      const leftCol = document.createElement('div'); leftCol.className = 'movie-col';
-      const leftLabel = document.createElement('div'); leftLabel.className = 'movie-label'; leftLabel.textContent = labelForIndex(leftIdx);
-      const leftName = document.createElement('div'); leftName.className = 'movie-name'; leftName.textContent = textValues[leftIdx];
-      const leftPile = document.createElement('div'); leftPile.className = 'card-pile';
-      const leftCtrls = document.createElement('div'); leftCtrls.className = 'controls';
-      const leftMinus = document.createElement('button'); leftMinus.className = 'ctrl-btn'; leftMinus.textContent = '−';
-      const leftInput = document.createElement('input'); leftInput.className = 'ctrl-input'; leftInput.type = 'number'; leftInput.min = '0'; leftInput.max = '50'; leftInput.step = '1'; leftInput.value = '0';
-      const leftPlus  = document.createElement('button'); leftPlus.className = 'ctrl-btn'; leftPlus.textContent = '+';
-      leftCtrls.append(leftMinus,leftInput,leftPlus);
-      leftCol.append(leftLabel,leftName,leftPile,leftCtrls);
+      // Pref + mazo único + controles (centrado)
+      const prefCol = document.createElement('div');
 
-      const vs = document.createElement('div'); vs.className = 'pair-vs'; vs.textContent = 'VS';
+      const choices = document.createElement('div'); choices.className = 'pref-choices';
+      const leftChoice  = document.createElement('label');
+      const rightChoice = document.createElement('label');
+      const leftRadio   = document.createElement('input');  leftRadio.type = 'radio';  leftRadio.name = `pref-${rowIndex}`; leftRadio.value = 'left';
+      const rightRadio  = document.createElement('input'); rightRadio.type = 'radio'; rightRadio.name = `pref-${rowIndex}`; rightRadio.value = 'right';
+      const leftText    = document.createElement('span'); leftText.className = 'movie-chip'; leftText.textContent  = labelForIndex(leftIdx);  leftText.title  = textValues[leftIdx];
+      const rightText   = document.createElement('span'); rightText.className= 'movie-chip'; rightText.textContent = labelForIndex(rightIdx); rightText.title = textValues[rightIdx];
+      leftChoice.append(leftRadio, leftText);
+      rightChoice.append(rightRadio, rightText);
+      choices.append(leftChoice, rightChoice);
 
-      const rightCol = document.createElement('div'); rightCol.className = 'movie-col';
-      const rightLabel = document.createElement('div'); rightLabel.className = 'movie-label'; rightLabel.textContent = labelForIndex(rightIdx);
-      const rightName = document.createElement('div'); rightName.className = 'movie-name'; rightName.textContent = textValues[rightIdx];
-      const rightPile = document.createElement('div'); rightPile.className = 'card-pile';
-      const rightCtrls = document.createElement('div'); rightCtrls.className = 'controls';
-      const rightMinus = document.createElement('button'); rightMinus.className = 'ctrl-btn'; rightMinus.textContent = '−';
-      const rightInput = document.createElement('input'); rightInput.className = 'ctrl-input'; rightInput.type = 'number'; rightInput.min = '0'; rightInput.max = '50'; rightInput.step = '1'; rightInput.value = '0';
-      const rightPlus  = document.createElement('button'); rightPlus.className = 'ctrl-btn'; rightPlus.textContent = '+';
-      rightCtrls.append(rightMinus,rightInput,rightPlus);
-      rightCol.append(rightLabel,rightName,rightPile,rightCtrls);
+      const pile = document.createElement('div'); pile.className = 'card-pile';
 
-      row.append(leftCol,vs,rightCol);
+      const ctrls = document.createElement('div'); ctrls.className = 'controls';
+      const minus = document.createElement('button'); minus.className = 'ctrl-btn'; minus.textContent = '−';
+      const input = document.createElement('input');  input.className = 'ctrl-input'; input.type = 'number'; input.min = '0'; input.max = '50'; input.step = '1'; input.value = '0';
+      const plus  = document.createElement('button'); plus.className  = 'ctrl-btn'; plus.textContent = '+';
+      ctrls.append(minus, input, plus);
+
+      prefCol.append(choices, pile, ctrls);
+      row.append(prefCol);
       grid.appendChild(row);
 
-      rowsState[rowIndex] = {leftCount:0, rightCount:0};
+      rowsState[rowIndex] = { pref: null, count: 0 };
+      setControlsEnabled(false);
+      renderPile(pile, 0);
 
       function clamp(v){
         v = parseInt(v||'0',10);
         if (isNaN(v)) v = 0;
         return Math.max(0, Math.min(50, v));
       }
-
-      function setDisabled(minusBtn, inputEl, plusBtn, disabled) {
-        minusBtn.disabled = disabled; inputEl.disabled = disabled; plusBtn.disabled = disabled;
+      function setControlsEnabled(enabled) {
+        minus.disabled = !enabled;
+        input.disabled = !enabled;
+        plus.disabled  = !enabled;
       }
-
-      function onChange(){
-        const l = clamp(leftInput.value);
-        const r = clamp(rightInput.value);
-        leftInput.value = l; rightInput.value = r;
-        rowsState[rowIndex].leftCount = l;
-        rowsState[rowIndex].rightCount = r;
-
-        renderPile(leftPile, l);
-        renderPile(rightPile, r);
-
-        // Exclusividad: si un lado > 0, deshabilitar el opuesto; si ambos 0, reactivar ambos
-        const leftActive  = l > 0;
-        const rightActive = r > 0;
-
-        if (leftActive && !rightActive) {
-          setDisabled(rightMinus, rightInput, rightPlus, true);
-          setDisabled(leftMinus, leftInput, leftPlus, false);
-        } else if (rightActive && !leftActive) {
-          setDisabled(leftMinus, leftInput, leftPlus, true);
-          setDisabled(rightMinus, rightInput, rightPlus, false);
-        } else if (!leftActive && !rightActive) {
-          setDisabled(leftMinus, leftInput, leftPlus, false);
-          setDisabled(rightMinus, rightInput, rightPlus, false);
-        } else {
-          // Si ambos > 0 por entrada manual, bloqueamos ambos para forzar corrección
-          setDisabled(leftMinus, leftInput, leftPlus, true);
-          setDisabled(rightMinus, rightInput, rightPlus, true);
-        }
-
+      function onPrefChange(side){
+        rowsState[rowIndex].pref = side;
+        rowsState[rowIndex].count = 0;
+        input.value = '0';
+        renderPile(pile, 0);
+        setControlsEnabled(!!side);
+        updateProgress();
+      }
+      function onCountChange(){
+        const c = clamp(input.value);
+        input.value = c;
+        rowsState[rowIndex].count = c;
+        renderPile(pile, c);
         updateProgress();
       }
 
-      leftMinus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(leftInput.value); if (cur > 0) { leftInput.value = cur - 1; onChange(); } });
-      leftPlus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(leftInput.value); if (cur < 50) { leftInput.value = cur + 1; } onChange(); });
-      rightMinus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(rightInput.value); if (cur > 0) { rightInput.value = cur - 1; onChange(); } });
-      rightPlus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(rightInput.value); if (cur < 50) { rightInput.value = cur + 1; } onChange(); });
-      leftInput .addEventListener('input', onChange);
-      rightInput.addEventListener('input', onChange);
+      leftRadio.addEventListener('change', () => { if (leftRadio.checked)  onPrefChange('left');  });
+      rightRadio.addEventListener('change', () => { if (rightRadio.checked) onPrefChange('right'); });
 
-      // Estado inicial
-      onChange();
+      minus.addEventListener('click', (e) => { e.preventDefault(); const cur = clamp(input.value); if (cur > 0) { input.value = cur - 1; onCountChange(); } });
+      plus .addEventListener('click', (e) => { e.preventDefault(); const cur = clamp(input.value); if (cur < 50) { input.value = cur + 1; onCountChange(); } });
+      input.addEventListener('input', onCountChange);
     }
 
     function updateProgress(){
       const roundButton = document.getElementById('roundButton');
       const nextButton  = document.getElementById('nextButton');
       const lastRound = (round + 1 === comp.length);
-      // No exigimos mínimo de cartas; empate (0-0) es válido
+      // Empate (sin elegir y 0 cartas) es válido
       roundButton.disabled = lastRound ? true : false;
       nextButton.disabled  = lastRound ? false : true;
     }
 
     function diffToSaaty(left, right){
       const diff = Math.abs(left - right);
-      return Math.min(9, 1 + diff); // 0=>1, 1=>2, ... >=8=>9
+      return Math.min(9, 1 + diff);
     }
-
     function transformScale(value){ return 0.5 + 0.5 * Math.log(value)/Math.log(9); }
 
-    function updateMatricesForPair(aIndex, bIndex, leftCount, rightCount){
-      const a = winList[aIndex];
-      const b = winList[bIndex];
-      const m = diffToSaaty(leftCount, rightCount);
+    function updateMatricesForPair(aIndex, bIndex, prefSide, count){
+      const a = winList[aIndex], b = winList[bIndex];
 
-      if (leftCount >= rightCount){
-        // preferencia izquierda (o empate)
-        M_saaty[a][b] = String(m);
-        M_saaty[b][a] = m === 1 ? '1' : `1/${m}`;
-        const val = leftCount === rightCount ? 0.5 : transformScale(m);
-        M_fpr[a][b] = val; M_fpr[b][a] = 1 - val;
-        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = val;
-        newWinList.push(a);
+      if (!prefSide || count === 0){
+        M_saaty[a][b] = '1'; M_saaty[b][a] = '1';
+        M_fpr[a][b] = 0.5;   M_fpr[b][a] = 0.5;
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = 0.5;
+        newWinList.push(a); // pasa arbitrariamente 'a' en empate
+        Lindex++; return;
+      }
+
+      const m = diffToSaaty(count, 0); // diff = count
+      if (prefSide === 'left'){
+        M_saaty[a][b] = String(m);     M_saaty[b][a] = m === 1 ? '1' : `1/${m}`;
+        const val = transformScale(m);  M_fpr[a][b] = val; M_fpr[b][a] = 1 - val;
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = val; newWinList.push(a);
       } else {
-        // preferencia derecha
-        M_saaty[a][b] = m === 1 ? '1' : `1/${m}`;
-        M_saaty[b][a] = String(m);
-        const val = transformScale(m);
-        M_fpr[a][b] = 1 - val; M_fpr[b][a] = val;
-        L[Lindex][0] = b; L[Lindex][1] = a; L[Lindex][2] = val;
-        newWinList.push(b);
+        M_saaty[a][b] = m === 1 ? '1' : `1/${m}`; M_saaty[b][a] = String(m);
+        const val = transformScale(m);           M_fpr[a][b] = 1 - val; M_fpr[b][a] = val;
+        L[Lindex][0] = b; L[Lindex][1] = a; L[Lindex][2] = val; newWinList.push(b);
       }
       Lindex++;
     }
 
     function runRound(){
-      // Leer cantidades de cada fila actual
       const rows = document.querySelectorAll('#pairsGrid .pair-row');
       rows.forEach((row, i) => {
-        const st = rowsState[i] || {leftCount:0,rightCount:0};
-        updateMatricesForPair(2*i, 2*i+1, st.leftCount, st.rightCount);
+        const st = rowsState[i] || {pref:null, count:0};
+        updateMatricesForPair(2*i, 2*i+1, st.pref, st.count);
       });
 
       if (winList.length % 2 === 1) newWinList.push(winList[winList.length-1]);
       winList = newWinList; newWinList = [];
 
-      // Siguiente ronda
       const grid = document.getElementById('pairsGrid');
       grid.innerHTML = '';
       Object.keys(rowsState).forEach(k => delete rowsState[k]);
@@ -391,7 +342,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Primera ronda
       const rows = Math.floor(winList.length/2);
       const grid = document.getElementById('pairsGrid');
       grid.innerHTML = '';
