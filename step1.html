@@ -1,102 +1,72 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTM</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tournament Tree Model · Paso 1</title>
 
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
-        }
+  <!-- Tipografías + estilos comunes -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-        }
-
-        p {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        .spinner-control {
-            display: block;
-            margin: 20px auto;
-            padding: 10px;
-            font-size: 16px;
-        }
-
-        .navigate-button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .navigate-button:hover {
-            background-color: #2980b9;
-        }
-    </style>
+  <meta name="theme-color" content="#3498db" />
 </head>
 <body>
-    <div class="container">
-        <p id="description">Introduce the number of movies to compare. Select between 4 and 6 movies.</p>
-        <input type="number" class="spinner-control" id="spinner" min="4" max="6" step="1" value="4">
-        <button id="next" class="navigate-button" onclick="goToElementsPage()">Next</button>
-    </div>
+  <!-- Logo fijo fuera de la tarjeta -->
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
 
-    <script>
+  <!-- Selector de idioma -->
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
 
-        const translations = {
-            en: {
-                description: "Introduce the number of movies to compare. Select between 4 and 6 movies.",
-                next: "Next"
-            },
-            es: {
-                description: "Introduce el número de películas a comparar. Puedes escoger entre 4 y 6 películas",
-                next: "Siguiente"
-            }
-        };
+  <!-- Contenido principal -->
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 id="title">Tournament Tree Model · Step 1</h1>
+    </header>
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedLanguage = localStorage.getItem('language') || 'en';
-            changeLanguage(savedLanguage);
-        });
+    <!-- Descripción específica de este paso (i18n) -->
+    <p id="description" data-i18n="step1_description">
+      Introduce the number of movies to compare. Select between 4 and 6 movies.
+    </p>
 
-        function changeLanguage(language) {
-            document.getElementById('description').textContent = translations[language].description;
-            document.getElementById('next').textContent = translations[language].next;
-        }
+    <form class="form" id="form" data-next="step2.html" novalidate>
+      <div class="field">
+        <label for="spinner" data-i18n="movies_number">Number of movies</label>
+        <input type="number" class="input" id="spinner" min="4" max="6" step="1" value="4" />
+      </div>
 
-        function goToElementsPage() {
-            const spinnerValue = document.getElementById('spinner').value;
-            localStorage.setItem('n', spinnerValue);
-            window.location.href = `step2.html?count=${spinnerValue}`;
-        }
+      <div class="actions">
+        <button id="nextButton" class="btn" type="submit" data-i18n="next">Next</button>
+      </div>
+    </form>
+  </main>
 
-
-    </script>
+  <!-- Lógica común (i18n + UX) -->
+  <script src="js/index.js"></script>
+  <script>
+    // Lógica específica de este paso
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('form');
+      const spinner = document.getElementById('spinner');
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        const n = Math.max(4, Math.min(6, parseInt(spinner.value || '4', 10)));
+        localStorage.setItem('n', String(n));
+        const nextUrl = form.getAttribute('data-next') || 'step2.html';
+        window.location.href = `${nextUrl}?count=${n}`;
+      });
+    });
+  </script>
 </body>
 </html>

@@ -16,6 +16,8 @@
         name_placeholder: "Enter your name",
         next: "Next",
         thanks: "Thank you for participating in the survey!",
+        step1_description: "Introduce the number of movies to compare. Select between 4 and 6 movies.",
+        movies_number: "Number of movies",
       },
       es: {
         title: "Tournament Tree Model · Encuesta",
@@ -25,6 +27,8 @@
         name_placeholder: "Introduce tu nombre",
         next: "Siguiente",
         thanks: "¡Gracias por participar en la encuesta!",
+        step1_description: "Introduce el número de películas a comparar. Puedes escoger entre 4 y 6 películas.",
+        movies_number: "Número de películas",
       },
     };
   
@@ -56,7 +60,12 @@
   
       // IDs concretos (si existen en la vista actual)
       setTextIf(els.title(), L.title);
-      setTextIf(els.description(), L.description);
+      // Sólo sobrescribir descripción si la clave existe para la vista
+      const descEl = els.description();
+      const key = descEl?.getAttribute?.("data-i18n");
+      if (key && L[key] != null) setTextIf(descEl, L[key]);
+      else if (!key) setTextIf(descEl, L.description);
+  
       setTextIf(els.nameLabel(), L.name_label);
       setTextIf(els.nameBox(), L.name_placeholder, {attr: "placeholder"});
       setTextIf(els.next(), L.next);
@@ -64,9 +73,9 @@
   
       // data-i18n genérico: <span data-i18n="key"></span>
       document.querySelectorAll("[data-i18n]").forEach(node => {
-        const key = node.getAttribute("data-i18n");
-        if (!key) return;
-        const txt = L[key];
+        const k = node.getAttribute("data-i18n");
+        if (!k) return;
+        const txt = L[k];
         if (txt == null) return;
         if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
           node.setAttribute("placeholder", txt);
@@ -135,4 +144,5 @@
     };
   
     document.addEventListener("DOMContentLoaded", init);
-  })();  
+  })();
+  
