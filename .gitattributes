@@ -1,0 +1,11 @@
+# Normaliza texto por defecto
+* text=auto
+
+# Fuerza LF en scripts y YAML
+*.sh text eol=lf
+*.bash text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# (Opcional) Fuerza CRLF en .bat si trabajas en Windows
+*.bat text eol=crlf
