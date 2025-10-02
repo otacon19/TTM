@@ -1,182 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTM</title>
-    <style>
-        body {
-            font-family: 'Lato', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tournament Tree Model · Encuesta</title>
 
-        .language-container {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            display: flex;
-            gap: 10px;
-            z-index: 10;
-        }
+  <!-- Tipografías y estilos comunes -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-        .language-container button {
-            padding: 5px 10px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-
-        .content {
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .container {
-            text-align: justify;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 800px;
-        }
-
-        .text-box-container {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .text-box {
-            margin: 10px auto;
-            padding: 10px;
-            font-size: 16px;
-            width: 80%;
-            border: 1px solid #ccc; /* Añadido */
-        }
-
-        .invalid {
-            border-color: red;
-        }
-
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-        }
-
-        p {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        #thanks {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .navigate-button {
-            margin-top: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .navigate-button:hover {
-            background-color: #2980b9;
-        }
-
-        .navigate-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-    </style>
+  <meta name="theme-color" content="#3498db" />
 </head>
 <body>
-    <div class="language-container">
-        <button onclick="changeLanguage('en')">
-            <img src="english.png" alt="Button Image" style="width: 20px; height: 20px; vertical-align: middle;">
-        </button>
-        <button onclick="changeLanguage('es')">
-            <img src="spanish.png" alt="Button Image" style="width: 20px; height: 20px; vertical-align: middle;">
-        </button>
-    </div>
-    <div class="container">
-        <p id="description">The purpose of this survey (change) is to evaluate a preference collection methodology and check whether the results obtained are in line with the user's preferences. To do so, we will ask you to list your favorite movies and compare them with each other. </b>
-            <div class="text-box-container" id="text-box-container">
-                <input class="text-box" id="name_box" placeholder="Introduce your name"></input>
-            </div>
-            <p id="thanks"><b>Thank you for participating in the survey!</b></p>
-        <center><button class="navigate-button" id="nextButton" onclick="goToNextStep()">Next</button></center>
-    </div>
+  <!-- Logo fijo fuera de la tarjeta -->
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
 
-    <script>
+  <!-- Selector de idioma -->
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
 
-        const translations = {
-            en: {
-                description: "The purpose of this survey is to evaluate a preference collection methodology and check whether the results obtained are in line with the user's preferences. To do so, we will ask you to list your favorite movies and compare them with each other.",
-                thanks: "Thank you for participating in the survey!",
-                name_box: "Introduce your name",
-                nextButton: "Next",
-            },
-            es: {
-                description: "Esta encuesta tiene como objetivo evaluar una metodología de recolección de opiniones y comprobar si los resultados obtenidos se ajustan a las preferencias del usuario. Para ello, le pediremos que enumere sus películas favoritas y las compare entre sí.",
-                thanks: "¡Gracias por participar en la encuesta!",
-                name_box: "Introduce tu nombre",
-                nextButton: "Siguiente",
-            }
-        };
+  <!-- Contenido principal -->
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 id="title">Tournament Tree Model · Survey</h1>
+    </header>
 
-        function changeLanguage(language) {
-            localStorage.setItem('language', language);
-            document.getElementById('description').textContent = translations[language].description;
-            document.getElementById('thanks').textContent = translations[language].thanks;
-            document.getElementById('name_box').placeholder = translations[language].name_box;
-            document.getElementById('nextButton').textContent = translations[language].nextButton;
-        }
+    <p id="description">
+      The purpose of this survey is to evaluate a preference collection methodology and check whether the results obtained are in line with the user's preferences. To do so, we will ask you to list your favorite movies and compare them with each other.
+    </p>
 
-        document.addEventListener("DOMContentLoaded", function() {
-            changeLanguage('en');
-            const savedLanguage = localStorage.getItem('language') || 'en';
-            
-            const text = document.getElementById('name_box');
-            text.addEventListener('input', validateTextBoxes);
-            validateTextBoxes();
-        });
+    <form class="form" id="form" novalidate>
+      <div class="field">
+        <label for="name_box" id="name_label">Your name</label>
+        <input id="name_box" class="input" type="text" name="name" placeholder="Enter your name" autocomplete="name" required />
+      </div>
 
-        function validateTextBoxes() {
-            const textBox = document.getElementById('name_box');
-            const nextButton = document.getElementById('nextButton');
+      <div class="actions">
+        <button id="nextButton" class="btn" type="submit">Next</button>
+        <span class="thanks" id="thanks">Thank you for participating in the survey!</span>
+      </div>
+    </form>
+  </main>
 
-            if (textBox.value === '') {
-                textBox.classList.add('invalid');
-                nextButton.disabled = true;
-            } else {
-                textBox.classList.remove('invalid');
-                nextButton.disabled = false;
-            }    
-        }
-
-        function goToNextStep() {
-
-            var text = document.getElementById("name_box");
-            const name = text.value;
-            localStorage.setItem('user_name', name);
-            
-            window.location.href = `step1.html`;
-        }
-    </script>
+  <!-- Lógica común (i18n + UX) -->
+  <script src="js/index.js"></script>
 </body>
 </html>
