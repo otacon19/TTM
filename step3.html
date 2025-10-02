@@ -1,376 +1,404 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTM comparison</title>
-    <style>
-        body {
-            font-family: 'Lato', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tournament Tree Model · Paso 3</title>
 
-        .container {
-            text-align: justify;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-           
-        }
+  <!-- Tipografías + estilos comunes -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-        .container-comp {
-            display: grid;
-            grid-template-columns: repeat(19, 1fr); /* 19 columnas */
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-            overflow-y: auto;
-        }
+  <meta name="theme-color" content="#3498db" />
 
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-        }
+  <!-- Estilos específicos Step 3 -->
+  <style>
+    .pairs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+      margin: 16px 0 20px;
+    }
 
-        p {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-        }
+    .pair-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 14px;
+      align-items: start;
+    }
 
-        .button-container {
-            text-align: center;
-            justify-content: center;
-        }
+    .movie-col {
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 8px;
+      align-items: start;
+    }
 
-        .navigate-button {
-            margin-top: 10px;
-            width: 200px;
-            height: 50px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+    .movie-label { font-weight: 700; text-align: center; }
+    .movie-name { color: var(--muted); font-size: 14px; text-align: center; }
 
-        .scale-button {
-            padding: 10px 20px;
-            font-size: 16px;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
+    /* Marco del mazo: apilado compacto dentro del contenedor */
+    .card-pile {
+      position: relative;
+      width: 240px;
+      height: 160px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 8px;
+      overflow: hidden; /* no salirse del marco */
+      margin-inline: auto;
+    }
 
-        .red {
-            background-color: red;
-        }
+    .card-tile {
+      position: absolute;
+      width: 90px; height: 128px; /* cartas más grandes */
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 6px 14px rgba(0,0,0,.10);
+      transform-origin: 50% 80%;
+      user-select: none;
+    }
+    .card-face {
+      position: absolute; inset: 6px;
+      border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9));
+    }
+    .card-rank, .card-suit {
+      position: absolute;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .card-rank { top: 6px; left: 8px; }
+    .card-suit { bottom: 6px; right: 8px; transform: rotate(180deg); }
 
-        .green {
-            background-color: green;
-        }
+    /* Colores por palo */
+    .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
+    .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
 
-        .selected {
-            background-color: blue !important;
-        }
+    .controls { display: flex; justify-content: center; gap: 8px; }
+    .ctrl-btn {
+      width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db;
+      background: #fff; cursor: pointer; font-weight: 700;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .ctrl-input {
+      width: 72px; height: 36px; text-align: center;
+      border-radius: 8px; border: 1px solid #d1d5db;
+    }
 
-        #title {
-            text-align: center;
-            font-weight: bold;
-        }
+    .pair-vs { font-weight: 700; color: var(--muted); align-self: center; }
 
-        .text-extreme {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            font-size: 14px;
-        }
+    .button-row { display: flex; gap: 12px; justify-content: center; }
+    .navigate-button { width: 220px; height: 48px; }
 
-        .navigate-button:hover {
-            background-color: #2980b9;
-        }
-        
-        .navigate-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-          
-    </style>
+    @media (max-width: 520px) {
+      .card-pile { width: 200px; height: 140px; }
+      .card-tile { width: 80px; height: 114px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="title">Compare movies</h1>
-        <p id="description">The movies are compared in pairs using values between <strong>1</strong> and <strong>9</strong> (you can find out the name of the movie by placing your mouse over the word 'Movie'). You should provide your preferences over the movies considering the following:</p>
-            <p id="red" style="color:red;">If you prefer the movie on the left, choose a value using the red scale.</p> 
-            <p id="green" style="color:green;">If you prefer the movie on the right, choose a value using the green scale.</p>
-            <p id="scale">Notice 9 means <em>'Extremely much better"</em>, 1 means <em>"Equal"</em> and the remainder values represent intermediate values of preference.</p>
-        <div class = "container-comp" id="comparison-container"></div>
-        <div class="button-container">
-            <button id="roundButton" class="navigate-button" onclick="TTM(round++)" disabled="true">Round</button>
-            <button id="nextButton" class="navigate-button" onclick="goToNextStep()" disabled="true">Next step</button>
-        </div>
+  <!-- Logo fijo fuera de la tarjeta -->
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
+
+  <!-- Selector de idioma -->
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
+
+  <!-- Contenido principal -->
+  <main class="card" role="main">
+    <!-- Sin título H1 dentro de la tarjeta -->
+    <p id="description" class="help" data-i18n="step3_description"></p>
+    <p id="hint" class="help" data-i18n="step3_cards_hint"></p>
+
+    <div class="pairs-grid" id="pairsGrid"></div>
+
+    <div class="button-row">
+      <button id="roundButton" class="btn navigate-button" onclick="runRound()" disabled data-i18n="roundButton_label">Next round</button>
+      <button id="nextButton" class="btn navigate-button" onclick="goToNextStep()" disabled data-i18n="nextButton_label">Next phase</button>
     </div>
+  </main>
 
-    <script>
+  <!-- Lógica común (i18n + UX) -->
+  <script src="js/index.js"></script>
+  <script>
+    // --- Paso 3 con cartas apiladas y exclusividad por pareja ---
+    let round = 0;
+    const textValues = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
+    const n = textValues.length;
 
-        const translations = {
-            en: {
-                title:"Compare movies",
-                description: "The movies are compared in pairs using values between <strong>1</strong> and <strong>9</strong> (you can find out the name of the movie by placing your mouse over the word 'Movie'). You should provide your preferences over the movies considering the following:",
-                red:"If you prefer the movie on the left, choose a value using the red scale.",
-                green:"If you prefer the movie on the right, choose a value using the green scale.",
-                scale:"Notice 9 means <em>'Extremely much better</em>,1 means <em>'Equal'</em> and the remainder values represent intermediate values of preference.",
-                roundButton: "Next round",
-                nextButton: "Next phase",
-            },
-            es: {
-                title:"Comparar películas",
-                description: "Las películas se comparan por pares usando valores entre <strong>1</strong> y <strong>9</strong> (puedes ver el nombre de la película si colocas el cursor sobre la palabra 'Movie'). Debes de comparar las películas teniendo en cuenta lo siguiente:",
-                red:"Si prefieres la película de la izquierda, elige un valor de la escala en color rojo. ",
-                green:"Si prefieres la película de la derecha, elige un valor de la escala en color verde",
-                scale:"Ten en cuenta que 9 significa <em>'Extremadamente mucho mejor'</em>, 1 significa <em>'Igual'</em> y el resto de valores representan valores intermedios de preferencia.",
-                roundButton: "Siguiente ronda",
-                nextButton: "Siguiente fase",
-            }
-        };
+    // Matrices
+    const M_fpr = Array.from({length: n}, () => Array.from({length: n}, () => 0));
+    for (let i = 0; i < n; i++) M_fpr[i][i] = 0.5;
+    const M_saaty = Array.from({length: n}, () => Array.from({length: n}, () => '1'));
 
-        function changeLanguage(language) {
-            document.getElementById('title').textContent = translations[language].title;
-            document.getElementById('description').innerHTML = translations[language].description;
-            document.getElementById('red').textContent = translations[language].red;
-            document.getElementById('green').textContent = translations[language].green;
-            document.getElementById('scale').innerHTML = translations[language].scale;
-            document.getElementById('roundButton').textContent = translations[language].roundButton;
-            document.getElementById('nextButton').textContent = translations[language].nextButton;
-        }
-        
-        const buttonValues = [9, 8, 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        let selectedButtons = { };
-        
-        let textValues = localStorage.getItem('movies').split(',');
-        let round = 0;
+    // Registro tipo L (ganador, perdedor, intensidad)
+    let L = Array.from({length: n}, () => Array(3).fill(0.0));
+    let Lindex = 0;
 
-        const n = textValues.length;    
-        const M_fpr = new Array(n).fill(null).map(() => new Array(n).fill(0));
-        for (let i = 0; i < n; i++) { M_fpr[i][i] = 0.5; }
-        const M_saaty = new Array(n).fill(null).map(() => new Array(n).fill("1"));
+    // Árbol de eliminaciones por rondas
+    function half(x){ return [Math.floor(x/2), x % 2]; }
+    function comparisons(n){
+      const nRounds = Math.ceil(Math.log2(n));
+      const arr = new Array(nRounds).fill(0);
+      let r = 0; let [C, R] = half(n); arr[r] = C;
+      while(!(C === 1 && R === 0)) { r++; [C, R] = half(C + R); arr[r] = C; }
+      return arr.map(Math.floor);
+    }
+    const comp = comparisons(n);
 
-        const comp = comparisons(n);
-        let winList = Array.from({ length: n }, (_, index) => index);
-        let newWinList = [];
-        
-        let L = new Array(n);
-        for (let i = 0; i < n; i++) { L[i] = new Array(3).fill(0.0)};
-  
-        function half(n) {
-            const result = new Array(2);
-            result[0] = Math.floor(n / 2);
-            result[1] = n % 2;
-            return result;
-        }
+    let winList = Array.from({length: n}, (_, i) => i);
+    let newWinList = [];
 
-        function comparisons(n) {
-            const nRounds = Math.ceil(Math.log2(n));
-            const comp = new Array(nRounds).fill(0);
-            let round = 0;
+    // Estado por fila: {leftCount, rightCount}
+    const rowsState = {};
 
-            let _half = half(n);
-            let C = _half[0];
-            let R = _half[1];
+    function labelForIndex(idx){
+      const tmpl = (window.TTM?.t('movie_label')) || 'Movie {i}';
+      return tmpl.replace('{i}', String(idx+1));
+    }
 
-            comp[round] = C;
-            while(!(C == 1 && R == 0)) {
-                round++;
-                _half = half(C+R);
-                C = _half[0];
-                R = _half[1];
-                comp[round] = C;
-            }
-            
-            return comp.map(Math.floor);
-        }
+    // Generación de cartas variadas
+    const SUITS = [
+      {s: '♠', cls: 'suit-black'},
+      {s: '♣', cls: 'suit-black'},
+      {s: '♥', cls: 'suit-red'},
+      {s: '♦', cls: 'suit-red'},
+    ];
+    const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 
-        const createButtonsRow = (rowIndex, fighterLeft, fighterRight) => {
-            const comparisonContainer = document.getElementById('comparison-container');
+    function makeCard(i){
+      const div = document.createElement('div');
+      div.className = 'card-tile';
+      const face = document.createElement('div'); face.className = 'card-face';
+      const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
+      const rank = RANKS[Math.floor(Math.random()*RANKS.length)];
+      div.classList.add(suit.cls);
 
-            indexLeft = textValues.indexOf(fighterLeft);
-            const leftTextNode = document.createElement('div');
-            leftTextNode.classList.add('text-extreme');
-            leftTextNode.textContent = `Movie ${indexLeft + 1}`;
-            leftTextNode.title = `${fighterLeft}`;
-            comparisonContainer.appendChild(leftTextNode);
+      const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
+      const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
+      face.append(rEl, sEl); div.appendChild(face);
+      return div;
+    }
 
-            buttonValues.forEach((value, index) => {
-                const button = document.createElement('button');
-                button.textContent = value;
-                button.classList.add('scale-button');
+    function renderPile(container, count){
+      container.innerHTML = '';
+      const MAX_CARDS = 50; // límite superior
+      const capped = Math.min(MAX_CARDS, Math.max(0, parseInt(count||'0',10)));
 
-                if (index < 8) {
-                    button.classList.add('red');
-                } else if (index > 8) {
-                    button.classList.add('green');
-                }
+      const PADDING = 8;
+      const CARD_W = 90, CARD_H = 128;
+      const STEP_X = 18;   // solapamiento horizontal
+      const STEP_Y = 6;    // solapamiento vertical
 
-                button.addEventListener('click', () => {
-                    if (selectedButtons[rowIndex]) {
-                        selectedButtons[rowIndex].classList.remove('selected');
-                    }
+      const innerW = container.clientWidth - 2*PADDING;
+      const innerH = container.clientHeight - 2*PADDING;
+      const cols = Math.max(1, Math.floor(innerW / STEP_X) + 1);
+      const maxTop = innerH - CARD_H;
 
-                    button.classList.add('selected');
-                    selectedButtons[rowIndex] = button;
+      for (let i = 0; i < capped; i++) {
+        const col = Math.min(i % cols, Math.floor((innerW - CARD_W) / STEP_X));
+        const row = Math.floor(i / cols);
+        const left = PADDING + Math.min(col * STEP_X, innerW - CARD_W);
+        const top  = PADDING + Math.min(row * STEP_Y, Math.max(0, maxTop));
 
-                    const selectedCount = Object.keys(selectedButtons).filter(key => selectedButtons[key] !== null).length;
-                    const totalRows = Object.keys(selectedButtons).length;
+        const card = makeCard(i);
+        const jitter = (Math.random()*6 - 3);
+        card.style.left = left + 'px';
+        card.style.top  = top + 'px';
+        card.style.transform = `rotate(${jitter}deg)`;
+        card.style.zIndex = String(10 + i);
+        container.appendChild(card);
+      }
+    }
 
-                    if(selectedCount === totalRows) {
-                        const roundButton = document.getElementById('roundButton');
-                        const nextButton = document.getElementById('nextButton');
-                        
-                        if(round + 1 === comp.length) {
-                            roundButton.disabled = true;
-                            nextButton.disabled = false;
-                        } else {
-                            roundButton.disabled = false;
-                        }
-                    }
-                });
+    function buildRow(rowIndex, leftIdx, rightIdx){
+      const grid = document.getElementById('pairsGrid');
+      const row = document.createElement('div');
+      row.className = 'pair-row';
 
-                comparisonContainer.appendChild(button);
-            });
+      const leftCol = document.createElement('div'); leftCol.className = 'movie-col';
+      const leftLabel = document.createElement('div'); leftLabel.className = 'movie-label'; leftLabel.textContent = labelForIndex(leftIdx);
+      const leftName = document.createElement('div'); leftName.className = 'movie-name'; leftName.textContent = textValues[leftIdx];
+      const leftPile = document.createElement('div'); leftPile.className = 'card-pile';
+      const leftCtrls = document.createElement('div'); leftCtrls.className = 'controls';
+      const leftMinus = document.createElement('button'); leftMinus.className = 'ctrl-btn'; leftMinus.textContent = '−';
+      const leftInput = document.createElement('input'); leftInput.className = 'ctrl-input'; leftInput.type = 'number'; leftInput.min = '0'; leftInput.max = '50'; leftInput.step = '1'; leftInput.value = '0';
+      const leftPlus  = document.createElement('button'); leftPlus.className = 'ctrl-btn'; leftPlus.textContent = '+';
+      leftCtrls.append(leftMinus,leftInput,leftPlus);
+      leftCol.append(leftLabel,leftName,leftPile,leftCtrls);
 
-            indexRight = textValues.indexOf(fighterRight);
-            const rightTextNode = document.createElement('div');
-            rightTextNode.classList.add('text-extreme');
-            rightTextNode.textContent = `Movie ${indexRight + 1}`;
-            rightTextNode.title = `${fighterRight}`;
-            comparisonContainer.appendChild(rightTextNode);
-        }
+      const vs = document.createElement('div'); vs.className = 'pair-vs'; vs.textContent = 'VS';
 
-        function transformScale(value) {
-            return 0.5 + 0.5 * Math.log(value)/Math.log(9);
-        }
-   
-        let Lindex = 0;
-        let nRow = 0;
+      const rightCol = document.createElement('div'); rightCol.className = 'movie-col';
+      const rightLabel = document.createElement('div'); rightLabel.className = 'movie-label'; rightLabel.textContent = labelForIndex(rightIdx);
+      const rightName = document.createElement('div'); rightName.className = 'movie-name'; rightName.textContent = textValues[rightIdx];
+      const rightPile = document.createElement('div'); rightPile.className = 'card-pile';
+      const rightCtrls = document.createElement('div'); rightCtrls.className = 'controls';
+      const rightMinus = document.createElement('button'); rightMinus.className = 'ctrl-btn'; rightMinus.textContent = '−';
+      const rightInput = document.createElement('input'); rightInput.className = 'ctrl-input'; rightInput.type = 'number'; rightInput.min = '0'; rightInput.max = '50'; rightInput.step = '1'; rightInput.value = '0';
+      const rightPlus  = document.createElement('button'); rightPlus.className = 'ctrl-btn'; rightPlus.textContent = '+';
+      rightCtrls.append(rightMinus,rightInput,rightPlus);
+      rightCol.append(rightLabel,rightName,rightPile,rightCtrls);
 
-        function TTM(round) {
+      row.append(leftCol,vs,rightCol);
+      grid.appendChild(row);
 
-            const comparisonContainer = document.getElementById('comparison-container');
+      rowsState[rowIndex] = {leftCount:0, rightCount:0};
 
-            if(round < comp.length) {
+      function clamp(v){
+        v = parseInt(v||'0',10);
+        if (isNaN(v)) v = 0;
+        return Math.max(0, Math.min(50, v));
+      }
 
-                let index = 0;
-                let m;
-        
-                for (let i = 0; i < comp[round]; i++) {
+      function setDisabled(minusBtn, inputEl, plusBtn, disabled) {
+        minusBtn.disabled = disabled; inputEl.disabled = disabled; plusBtn.disabled = disabled;
+      }
 
-                    m = selectedButtons[nRow].textContent;
-        
-                    if (selectedButtons[nRow].classList.contains('red')) {
-                        M_saaty[winList[index]][winList[index + 1]] = m;
-                        M_saaty[winList[index + 1]][winList[index]] = "1/" + m;
-                        M_fpr[winList[index]][winList[index+1]] = transformScale(parseFloat(m));
-                        M_fpr[winList[index + 1]][winList[index]] = 1 - M_fpr[winList[index]][winList[index+1]];
-                        
-                        L[Lindex][0] = winList[index];
-                        L[Lindex][1] = winList[index + 1];
-                        
-                        newWinList.push(winList[index]);
-                    } else {
-                        M_saaty[winList[index]][winList[index+1]] = "1/" + m;
-                        M_saaty[winList[index + 1]][winList[index]] = m;
-                        M_fpr[winList[index]][winList[index+1]] = transformScale(parseFloat(1 / m));
-                        M_fpr[winList[index + 1]][winList[index]] = 1 - M_fpr[winList[index]][winList[index+1]];
-                        
-                        L[Lindex][0] = winList[index + 1];
-                        L[Lindex][1] = winList[index];
-                        
-                        newWinList.push(winList[index + 1]);
-                    }
-                        
-                    L[Lindex][2] = transformScale(parseFloat(m));
+      function onChange(){
+        const l = clamp(leftInput.value);
+        const r = clamp(rightInput.value);
+        leftInput.value = l; rightInput.value = r;
+        rowsState[rowIndex].leftCount = l;
+        rowsState[rowIndex].rightCount = r;
 
-                    index += 2;
-                    Lindex++;
-                    nRow++;
-                }
+        renderPile(leftPile, l);
+        renderPile(rightPile, r);
 
-                if(winList.length % 2 == 1) {
-                    newWinList.push(winList[winList.length-1]);
-                }
+        // Exclusividad: si un lado > 0, deshabilitar el opuesto; si ambos 0, reactivar ambos
+        const leftActive  = l > 0;
+        const rightActive = r > 0;
 
-                winList = newWinList;
-                newWinList = [];
-                    
-                const newRows = Math.floor(winList.length / 2);
-                let totalRows = Object.keys(selectedButtons).length;
-                
-                for (let j = 0; j < newRows; j++) {
-                    selectedButtons[totalRows] = null;
-                    createButtonsRow(totalRows, textValues[winList[2 * j]], textValues[winList[2 * j + 1]]);
-                    totalRows++;
-                }
-
-                const selectedCount = Object.keys(selectedButtons).filter(key => selectedButtons[key] !== null).length;
-                const roundButton = document.getElementById('roundButton');
-                if(selectedCount != totalRows) {
-                    roundButton.disabled = true;
-                }
-            }
-         }
-
-        function goToNextStep() {
-
-            TTM(round++);
-            L[Lindex][0] = winList[winList.length-1]
-            L[Lindex][1] = winList[winList.length-1];
-            L[Lindex][2] = 0.5;
-
-            const matrixText = L.map(row => row.join(' ')).join(';') + '\n';
-            localStorage.setItem('matrixL', matrixText);
-
-            //http://localhost:5501/save-matrixL
-           /* fetch('/save-matrixL', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ L })
-            })
-            .then(response => response.text())
-            .then(data => { console.log('Success:', data); })
-            .catch((error) => { console.error('Error:', error); });*/
-
-            const matrixFPRJSON = JSON.stringify(M_fpr);
-            const matrixSaatyJSON = JSON.stringify(M_saaty);
-            const encodedFPRMatrix = encodeURIComponent(matrixFPRJSON);
-            const encodedSaatyMatrix = encodeURIComponent(matrixSaatyJSON);
-
-            window.location.href = `step4.html?matrixFPR=${encodedFPRMatrix}&matrixSaaty=${encodedSaatyMatrix}`;
+        if (leftActive && !rightActive) {
+          setDisabled(rightMinus, rightInput, rightPlus, true);
+          setDisabled(leftMinus, leftInput, leftPlus, false);
+        } else if (rightActive && !leftActive) {
+          setDisabled(leftMinus, leftInput, leftPlus, true);
+          setDisabled(rightMinus, rightInput, rightPlus, false);
+        } else if (!leftActive && !rightActive) {
+          setDisabled(leftMinus, leftInput, leftPlus, false);
+          setDisabled(rightMinus, rightInput, rightPlus, false);
+        } else {
+          // Si ambos > 0 por entrada manual, bloqueamos ambos para forzar corrección
+          setDisabled(leftMinus, leftInput, leftPlus, true);
+          setDisabled(rightMinus, rightInput, rightPlus, true);
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const savedLanguage = localStorage.getItem('language') || 'en';
-            changeLanguage(savedLanguage);
+        updateProgress();
+      }
 
-            for (let i = 0; i < comp[0]; i++) {
-                selectedButtons[i] = null;
-                createButtonsRow(i, textValues[2 * i], textValues[2 * i + 1]);
-            }
-        });
+      leftMinus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(leftInput.value); if (cur > 0) { leftInput.value = cur - 1; onChange(); } });
+      leftPlus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(leftInput.value); if (cur < 50) { leftInput.value = cur + 1; } onChange(); });
+      rightMinus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(rightInput.value); if (cur > 0) { rightInput.value = cur - 1; onChange(); } });
+      rightPlus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(rightInput.value); if (cur < 50) { rightInput.value = cur + 1; } onChange(); });
+      leftInput .addEventListener('input', onChange);
+      rightInput.addEventListener('input', onChange);
 
-    </script>
+      // Estado inicial
+      onChange();
+    }
+
+    function updateProgress(){
+      const roundButton = document.getElementById('roundButton');
+      const nextButton  = document.getElementById('nextButton');
+      const lastRound = (round + 1 === comp.length);
+      // No exigimos mínimo de cartas; empate (0-0) es válido
+      roundButton.disabled = lastRound ? true : false;
+      nextButton.disabled  = lastRound ? false : true;
+    }
+
+    function diffToSaaty(left, right){
+      const diff = Math.abs(left - right);
+      return Math.min(9, 1 + diff); // 0=>1, 1=>2, ... >=8=>9
+    }
+
+    function transformScale(value){ return 0.5 + 0.5 * Math.log(value)/Math.log(9); }
+
+    function updateMatricesForPair(aIndex, bIndex, leftCount, rightCount){
+      const a = winList[aIndex];
+      const b = winList[bIndex];
+      const m = diffToSaaty(leftCount, rightCount);
+
+      if (leftCount >= rightCount){
+        // preferencia izquierda (o empate)
+        M_saaty[a][b] = String(m);
+        M_saaty[b][a] = m === 1 ? '1' : `1/${m}`;
+        const val = leftCount === rightCount ? 0.5 : transformScale(m);
+        M_fpr[a][b] = val; M_fpr[b][a] = 1 - val;
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = val;
+        newWinList.push(a);
+      } else {
+        // preferencia derecha
+        M_saaty[a][b] = m === 1 ? '1' : `1/${m}`;
+        M_saaty[b][a] = String(m);
+        const val = transformScale(m);
+        M_fpr[a][b] = 1 - val; M_fpr[b][a] = val;
+        L[Lindex][0] = b; L[Lindex][1] = a; L[Lindex][2] = val;
+        newWinList.push(b);
+      }
+      Lindex++;
+    }
+
+    function runRound(){
+      // Leer cantidades de cada fila actual
+      const rows = document.querySelectorAll('#pairsGrid .pair-row');
+      rows.forEach((row, i) => {
+        const st = rowsState[i] || {leftCount:0,rightCount:0};
+        updateMatricesForPair(2*i, 2*i+1, st.leftCount, st.rightCount);
+      });
+
+      if (winList.length % 2 === 1) newWinList.push(winList[winList.length-1]);
+      winList = newWinList; newWinList = [];
+
+      // Siguiente ronda
+      const grid = document.getElementById('pairsGrid');
+      grid.innerHTML = '';
+      Object.keys(rowsState).forEach(k => delete rowsState[k]);
+      const newRows = Math.floor(winList.length/2);
+      for (let j = 0; j < newRows; j++) buildRow(j, winList[2*j], winList[2*j+1]);
+
+      round++;
+      updateProgress();
+      if (window.TTM?.refresh) window.TTM.refresh();
+    }
+
+    function goToNextStep(){
+      if (round < comp.length) runRound();
+      L[Lindex][0] = winList[winList.length-1];
+      L[Lindex][1] = winList[winList.length-1];
+      L[Lindex][2] = 0.5;
+
+      const matrixText = L.map(row => row.join(' ')).join(';') + '\n';
+      localStorage.setItem('matrixL', matrixText);
+
+      const encodedFPRMatrix = encodeURIComponent(JSON.stringify(M_fpr));
+      const encodedSaatyMatrix = encodeURIComponent(JSON.stringify(M_saaty));
+      window.location.href = `step4.html?matrixFPR=${encodedFPRMatrix}&matrixSaaty=${encodedSaatyMatrix}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Primera ronda
+      const rows = Math.floor(winList.length/2);
+      const grid = document.getElementById('pairsGrid');
+      grid.innerHTML = '';
+      for (let i = 0; i < rows; i++) buildRow(i, 2*i, 2*i+1);
+      updateProgress();
+      if (window.TTM?.refresh) window.TTM.refresh();
+    });
+  </script>
 </body>
 </html>

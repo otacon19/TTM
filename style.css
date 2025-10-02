@@ -166,3 +166,7 @@
     text-align: center;
   }
   
+  #movie-list {
+    display: grid;
+    gap: 10px;
+  }

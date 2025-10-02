@@ -1,162 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTM elements</title>
-    <style>
-        body {
-            font-family: 'Lato', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tournament Tree Model · Paso 2</title>
 
-        .container {
-            text-align: center;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 600px;
-        }
+  <!-- Tipografías + estilos comunes -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-        }
-
-        p {
-            color: #666;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-
-        .text-box-container {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .text-box {
-            margin: 10px auto;
-            padding: 10px;
-            font-size: 16px;
-            width: 80%;
-            border: 1px solid #ccc; /* Añadido */
-        }
-
-        .button-container {
-            margin-top: 20px;
-        }
-
-        .navigate-button {
-            margin-top: 10px;
-            width: 150px;
-            height: 50px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
-
-        .navigate-button:hover {
-            background-color: #2980b9;
-        }
-        
-        .navigate-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        .invalid {
-            border-color: red;
-        }
-    </style>
+  <meta name="theme-color" content="#3498db" />
 </head>
 <body>
-    <div class="container">
-        <div class="text-box-container" id="text-box-container">
-            <p id="description">Introduce the name of the movies.</p>
-        </div>
-        <div class="button-container">
-            <button id="nextButton" class="navigate-button" onclick="goToNextStep()">Next</button>
-        </div>
-    </div>
+  <!-- Logo fijo fuera de la tarjeta -->
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
 
-    <script>
-      
-        const translations = {
-            en: {
-                description: "Introduce the name of the movies.",
-                nextButton: "Next",
-            },
-            es: {
-                description: "Introduce el nombre de las películas.",
-                nextButton: "Siguiente",
-            }
-        };
+  <!-- Selector de idioma -->
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
 
-        function changeLanguage(language) {
-            document.getElementById('description').textContent = translations[language].description;
-            document.getElementById('nextButton').textContent = translations[language].nextButton;
-        }
+  <!-- Contenido principal -->
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 id="title">Tournament Tree Model · Step 2</h1>
+    </header>
 
-        const n = Number(localStorage.getItem('n'));
+    <!-- Descripción específica del paso (i18n centralizado en index.js) -->
+    <p id="description" data-i18n="step2_description">
+      <!-- i18n -->
+    </p>
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const savedLanguage = localStorage.getItem('language') || 'en';
-            changeLanguage(savedLanguage);
+    <form class="form" id="form" data-next="step3.html" novalidate>
+      <div class="field">
+        <label for="movie-list" id="movies_label" data-i18n="movies_label">Movies</label>
+        <div id="movie-list" class="text-box-container"></div>
+      </div>
 
-            const container = document.getElementById('text-box-container');
-            for (let i = 0; i < n; i++) {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.className = 'text-box';
-                input.addEventListener('input', validateTextBoxes);
-                container.appendChild(input);
-            }
+      <div class="actions">
+        <button id="nextButton" class="btn" type="submit" data-i18n="next">Next</button>
+      </div>
+    </form>
+  </main>
 
-            validateTextBoxes();
+  <!-- Lógica común (i18n + UX) -->
+  <script src="js/index.js"></script>
+  <script>
+    // Lógica específica del Paso 2 — genera inputs en función de n y aplica i18n centralizado
+    document.addEventListener('DOMContentLoaded', () => {
+      const n = Math.max(4, Math.min(6, parseInt(localStorage.getItem('n') || '4', 10)));
+      const list = document.getElementById('movie-list');
+
+      for (let i = 1; i <= n; i++) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'input text-box';
+        input.setAttribute('data-i18n', 'movie_placeholder');
+        input.setAttribute('data-i', String(i));
+        input.addEventListener('input', () => {
+          // Validación ligera por campo
+          input.classList.toggle('invalid', !input.value.trim());
+          validateAll();
         });
+        list.appendChild(input);
+      }
 
-        function validateTextBoxes() {
-            const textBoxes = document.getElementsByClassName('text-box');
-            let allFilled = true;
+      // Aplicar i18n a los nuevos nodos creados
+      if (window.TTM?.refresh) window.TTM.refresh();
 
-            for (let i = 0; i < textBoxes.length; i++) {
-                if (textBoxes[i].value === '') {
-                    allFilled = false;
-                    textBoxes[i].classList.add('invalid');
-                } else {
-                    textBoxes[i].classList.remove('invalid');
-                }
-            }
+      function validateAll() {
+        const inputs = document.querySelectorAll('#movie-list input[type="text"]');
+        let allFilled = true;
+        inputs.forEach(inp => {
+          const empty = !inp.value.trim();
+          inp.classList.toggle('invalid', empty);
+          if (empty) allFilled = false;
+        });
+        const btn = document.getElementById('nextButton');
+        if (btn) btn.disabled = !allFilled;
+        return allFilled;
+      }
 
-            const actionButton = document.getElementById('nextButton');
-            actionButton.disabled = !allFilled;
-        }
+      // Validación inicial
+      validateAll();
 
-        function goToNextStep() { //Pass the values by URL separated by commas
-            const textBoxes = document.getElementsByClassName('text-box');
-            let moviesNames = [];
-
-            for (let i = 0; i < textBoxes.length; i++) { moviesNames.push(textBoxes[i].value); }
-
-            localStorage.setItem('movies', moviesNames.join(','));
-
-            window.location.href = `step3.html`;
-        }
-
-    </script>
+      // Envío
+      const form = document.getElementById('form');
+      form.addEventListener('submit', (ev) => {
+        ev.preventDefault();
+        if (!validateAll()) return;
+        const values = Array.from(document.querySelectorAll('#movie-list input[type="text"]'))
+          .map(i => i.value.trim());
+        localStorage.setItem('movies', values.join(','));
+        const nextUrl = form.getAttribute('data-next') || 'step3.html';
+        window.location.href = nextUrl;
+      });
+    });
+  </script>
 </body>
 </html>

@@ -18,6 +18,9 @@
         thanks: "Thank you for participating in the survey!",
         step1_description: "Introduce the number of movies to compare. Select between 4 and 6 movies.",
         movies_number: "Number of movies",
+        step2_description: "Introduce the name of the movies.",
+        movies_label: "Movies",
+        movie_placeholder: "Movie {i}"
       },
       es: {
         title: "Tournament Tree Model · Encuesta",
@@ -29,6 +32,9 @@
         thanks: "¡Gracias por participar en la encuesta!",
         step1_description: "Introduce el número de películas a comparar. Puedes escoger entre 4 y 6 películas.",
         movies_number: "Número de películas",
+        step2_description: "Introduce el nombre de las películas.",
+        movies_label: "Películas",
+        movie_placeholder: "Película {i}"
       },
     };
   
@@ -45,104 +51,112 @@
     };
   
     const getLang = () => localStorage.getItem("language")
-      || ((navigator.language || "en").startsWith("es") ? "es" : "en");
-  
-    function setTextIf(el, text, {attr = "text"} = {}) {
-      if (!el || text == null) return;
-      if (attr === "text") el.textContent = text;
-      else if (attr === "placeholder") el.placeholder = text;
-      else el.setAttribute(attr, text);
+    || ((navigator.language || "en").startsWith("es") ? "es" : "en");
+
+  function formatTemplate(str, data = {}) {
+    if (typeof str !== 'string') return str;
+    return str.replace(/\{(\w+)\}/g, (_, k) => (data[k] != null ? String(data[k]) : `{${k}}`));
+  }
+
+  function setTextIf(el, text, {attr = "text", data = {}} = {}) {
+    if (!el || text == null) return;
+    const value = formatTemplate(text, data);
+    if (attr === "text") el.textContent = value;
+    else if (attr === "placeholder") el.placeholder = value;
+    else el.setAttribute(attr, value);
+  }
+
+  function applyLang(lang) {
+    const L = I18N[lang] ?? I18N.en;
+    localStorage.setItem("language", lang);
+
+    // IDs concretos
+    setTextIf(els.title(), L.title);
+
+    // Descripción
+    const descEl = els.description();
+    const descKey = descEl?.getAttribute?.("data-i18n");
+    if (descEl) {
+      if (descKey && L[descKey] != null) setTextIf(descEl, L[descKey]);
+      else if (!descKey) setTextIf(descEl, L.description);
     }
-  
-    function applyLang(lang) {
-      const L = I18N[lang] ?? I18N.en;
-      localStorage.setItem("language", lang);
-  
-      // IDs concretos (si existen en la vista actual)
-      setTextIf(els.title(), L.title);
-      // Sólo sobrescribir descripción si la clave existe para la vista
-      const descEl = els.description();
-      const key = descEl?.getAttribute?.("data-i18n");
-      if (key && L[key] != null) setTextIf(descEl, L[key]);
-      else if (!key) setTextIf(descEl, L.description);
-  
-      setTextIf(els.nameLabel(), L.name_label);
-      setTextIf(els.nameBox(), L.name_placeholder, {attr: "placeholder"});
-      setTextIf(els.next(), L.next);
-      setTextIf(els.thanks(), L.thanks);
-  
-      // data-i18n genérico: <span data-i18n="key"></span>
-      document.querySelectorAll("[data-i18n]").forEach(node => {
-        const k = node.getAttribute("data-i18n");
-        if (!k) return;
-        const txt = L[k];
-        if (txt == null) return;
-        if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-          node.setAttribute("placeholder", txt);
-        } else {
-          node.textContent = txt;
-        }
-      });
-  
-      document.documentElement.lang = lang;
-    }
-  
-    function validatePresence(inputEl, buttonEl) {
-      if (!inputEl || !buttonEl) return true;
-      const empty = !inputEl.value.trim();
-      inputEl.classList.toggle("invalid", empty);
-      buttonEl.disabled = empty;
-      return !empty;
-    }
-  
-    function bindFormIfPresent() {
-      const form = els.form();
-      const nameBox = els.nameBox();
-      const nextBtn = els.next();
-      if (!form) return; // otra vista sin formulario
-  
-      const onInput = () => validatePresence(nameBox, nextBtn);
-      nameBox && nameBox.addEventListener("input", onInput);
-  
-      form.addEventListener("submit", (ev) => {
-        ev.preventDefault();
-        if (!validatePresence(nameBox, nextBtn)) return;
-        if (nameBox) localStorage.setItem("user_name", nameBox.value.trim());
-        // Por defecto, avanzar a step1.html si no se define otra acción
-        const nextUrl = form.getAttribute("data-next") || "step1.html";
-        window.location.href = nextUrl;
-      });
-  
-      // Estado inicial de validación
-      onInput();
-    }
-  
-    function bindLanguageButtons() {
-      const en = els.btnEn();
-      const es = els.btnEs();
-      if (en) en.addEventListener("click", () => applyLang("en"));
-      if (es) es.addEventListener("click", () => applyLang("es"));
-    }
-  
-    function init() {
-      // Idioma
-      const lang = getLang();
-      applyLang(lang);
-  
-      // Enlaces para cambiar idioma
-      bindLanguageButtons();
-  
-      // Formulario (si existe en la vista)
-      bindFormIfPresent();
-    }
-  
-    // Exponer utilidades globales por si quieres usarlas en otras vistas
-    window.TTM = {
-      setLanguage: applyLang,
-      getLanguage: getLang,
-      t: (key) => (I18N[localStorage.getItem("language") || "en"] || I18N.en)[key],
-    };
-  
-    document.addEventListener("DOMContentLoaded", init);
-  })();
-  
+
+    setTextIf(els.nameLabel(), L.name_label);
+    setTextIf(els.nameBox(), L.name_placeholder, {attr: "placeholder"});
+    setTextIf(els.next(), L.next);
+    setTextIf(els.thanks(), L.thanks);
+
+    // data-i18n genérico
+    document.querySelectorAll("[data-i18n]").forEach(node => {
+      const key = node.getAttribute("data-i18n");
+      if (!key) return;
+      const txt = L[key];
+      if (txt == null) return;
+
+      const index = node.getAttribute("data-i");
+      const formatted = formatTemplate(txt, { i: index });
+
+      const tag = node.tagName;
+      const type = (node.getAttribute && node.getAttribute('type')) || '';
+      if (tag === "INPUT" || tag === "TEXTAREA") {
+        setTextIf(node, formatted, {attr: "placeholder"});
+      } else {
+        setTextIf(node, formatted, {attr: "text"});
+      }
+    });
+
+    document.documentElement.lang = lang;
+  }
+
+  function validatePresence(inputEl, buttonEl) {
+    if (!inputEl || !buttonEl) return true;
+    const empty = !inputEl.value.trim();
+    inputEl.classList.toggle("invalid", empty);
+    buttonEl.disabled = empty;
+    return !empty;
+  }
+
+  function bindFormIfPresent() {
+    const form = els.form();
+    const nameBox = els.nameBox();
+    const nextBtn = els.next();
+    if (!form) return;
+
+    const onInput = () => validatePresence(nameBox, nextBtn);
+    nameBox && nameBox.addEventListener("input", onInput);
+
+    form.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      if (!validatePresence(nameBox, nextBtn)) return;
+      if (nameBox) localStorage.setItem("user_name", nameBox.value.trim());
+      const nextUrl = form.getAttribute("data-next") || "step1.html";
+      window.location.href = nextUrl;
+    });
+
+    onInput();
+  }
+
+  function bindLanguageButtons() {
+    const en = els.btnEn();
+    const es = els.btnEs();
+    if (en) en.addEventListener("click", () => applyLang("en"));
+    if (es) es.addEventListener("click", () => applyLang("es"));
+  }
+
+  function init() {
+    const lang = getLang();
+    applyLang(lang);
+    bindLanguageButtons();
+    bindFormIfPresent();
+  }
+
+  // API global
+  window.TTM = {
+    setLanguage: applyLang,
+    getLanguage: getLang,
+    t: (key) => (I18N[localStorage.getItem("language") || "en"] || I18N.en)[key],
+    refresh: () => applyLang(localStorage.getItem("language") || getLang()),
+  };
+
+  document.addEventListener("DOMContentLoaded", init);
+})();
