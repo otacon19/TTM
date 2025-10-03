@@ -1,69 +1,227 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Thank You</title>
-<style>
-    body {
-        font-family: 'Lato', sans-serif;
-        background-color: #f5f5f5;
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTM · Step 5 (Re-compare adjacent)</title>
 
-    .container {
-        text-align: center;
-        background-color: #fff;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#3498db" />
 
-    h1 {
-        color: #333;
-        font-size: 2.5rem;
-    }
+  <style>
+    .pairs-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .pair-row { display: grid; grid-template-rows: auto auto auto; gap: 10px; justify-items: center; align-items: start; }
 
-    p {
-        color: #666;
-        font-size: 16px;
-        margin-top: 10px;
+    .pref-choices { display: flex; gap: 10px; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .pref-choices label {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 1px solid #e5e7eb; background: #fff; border-radius: 999px;
+      padding: 6px 10px; box-shadow: 0 1px 2px rgba(0,0,0,.06); cursor: pointer; font-size: 14px;
     }
-</style>
+    .pref-choices input[type="radio"] { accent-color: var(--primary); }
+    .movie-chip { cursor: help; }
+
+    .card-pile {
+      position: relative; width: 600px; height: 170px;
+      background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 12px; padding: 8px; overflow: hidden;
+    }
+    .pile-count { position: absolute; bottom: 8px; right: 10px; font-size: 12px; color: #374151; background: rgba(255,255,255,.9); padding: 2px 8px; border-radius: 999px; border: 1px solid #e5e7eb; }
+
+    .controls { display: flex; gap: 8px; align-items: center; justify-content: center; }
+    .ctrl-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .ctrl-input { width: 72px; height: 36px; text-align: center; border-radius: 8px; border: 1px solid #d1d5db; }
+
+    /* Cartas */
+    .card-tile { position: absolute; width: 80px; height: 114px; border-radius: 9px; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 5px 12px rgba(0,0,0,.10); transform-origin: 50% 80%; user-select: none; }
+    .card-face { position: absolute; inset: 6px; border-radius: 7px; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9)); }
+    .card-rank, .card-suit { position: absolute; font-size: 13px; font-weight: 700; line-height: 1; }
+    .card-rank { top: 6px; left: 8px; }
+    .card-suit { bottom: 6px; right: 8px; transform: rotate(180deg); }
+    .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
+    .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
+
+    .footer { margin-top: 18px; display: grid; justify-items: center; gap: 10px; }
+    .navigate-button { width: 220px; height: 46px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="thanks">Thank You!</h1>
-        <p id="thanks2">We appreciate your participation.</p>
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
+
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
+
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 data-i18n="step4r_continue_recompare">Re-compare</h1>
+      <p class="lead" id="introText"></p>
+    </header>
+
+    <div class="pairs-grid" id="pairsGrid"></div>
+
+    <div class="footer">
+      <button class="btn navigate-button" id="saveBtn" data-i18n="step4r_continue">Continue</button>
     </div>
-</body>
+  </main>
 
-<script>
-    const translations = {
-        en: {
-            thanks:"Thank You!",
-            thanks2: "We appreciate your participation.",
-        },
-        es: {
-            thanks:"¡Gracias!",
-            thanks2: "Agradecemos tu participación.",
-        }
-    };
-
-    function changeLanguage(language) {
-        document.getElementById('thanks').textContent = translations[language].thanks;
-        document.getElementById('thanks2').textContent = translations[language].thanks2;    
+  <script src="js/index.js"></script>
+  <script>
+    // i18n helper
+    function t(key, data={}) {
+      if (window.TTM?.t) {
+        const str = window.TTM.t(key) || '';
+        return str.replace(/\{(\w+)\}/g, (_,k) => (data[k] != null ? String(data[k]) : `{${k}}`));
+      }
+      return key;
+    }
+    function movieLabel(i) {
+      const tmpl = t('movie_placeholder') || 'Movie {i}';
+      return tmpl.replace('{i}', String(i+1));
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const savedLanguage = localStorage.getItem('language') || 'en';
-        changeLanguage(savedLanguage);
-    });
+    const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
+    const n = movies.length;
 
-</script>
+    // Orden a usar: overrideOrder (si reordenó en Step 4) o lastComputedOrder (del ranking calculado)
+    const overrideOrder = JSON.parse(localStorage.getItem('overrideOrder') || 'null');
+    const lastComputedOrder = JSON.parse(localStorage.getItem('lastComputedOrder') || 'null');
+    const order = Array.isArray(overrideOrder) ? overrideOrder : (Array.isArray(lastComputedOrder) ? lastComputedOrder : Array.from({length:n}, (_,i)=>i));
 
+    // Texto intro i18n
+    function setIntro(){
+      const partsEN = "Please compare adjacent pairs from your current ranking: Top 1 vs Top 2, Top 2 vs Top 3, and so on. First pick which one you prefer, then add cards to reflect how much.";
+      const partsES = "Compara los pares adyacentes de tu ranking actual: Top 1 vs Top 2, Top 2 vs Top 3, y así sucesivamente. Primero elige cuál prefieres y luego añade cartas para reflejar cuánto.";
+      const isES = (localStorage.getItem('language') || 'en').startsWith('es');
+      document.getElementById('introText').textContent = isES ? partsES : partsEN;
+    }
+
+    // Cartas
+    const SUITS = [{s:'♠', cls:'suit-black'},{s:'♣', cls:'suit-black'},{s:'♥', cls:'suit-red'},{s:'♦', cls:'suit-red'}];
+    const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    function makeCard(){
+      const div = document.createElement('div');
+      div.className = 'card-tile';
+      const face = document.createElement('div'); face.className = 'card-face';
+      const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
+      const rank = RANKS[Math.floor(Math.random()*RANKS.length)];
+      div.classList.add(suit.cls);
+      const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
+      const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
+      face.append(rEl, sEl); div.appendChild(face);
+      return div;
+    }
+    function renderPile(container, count){
+      container.innerHTML = '';
+      const MAX_CARDS = 50;
+      const capped = Math.min(MAX_CARDS, Math.max(0, Math.round(count)));
+      const PADDING = 8, CARD_W = 80, CARD_H = 114, STEP_X = 18, STEP_Y = 6;
+      const innerW = container.clientWidth - 2*PADDING;
+      const innerH = container.clientHeight - 2*PADDING;
+      const cols = Math.max(1, Math.floor(innerW / STEP_X) + 1);
+      const maxTop = innerH - CARD_H;
+      for (let i=0;i<capped;i++){
+        const col = Math.min(i % cols, Math.floor((innerW - CARD_W) / STEP_X));
+        const row = Math.floor(i / cols);
+        const left = PADDING + Math.min(col * STEP_X, innerW - CARD_W);
+        const top  = PADDING + Math.min(row * STEP_Y, Math.max(0, maxTop));
+        const card = makeCard();
+        const jitter = (Math.random()*5 - 2.5);
+        card.style.left = left + 'px';
+        card.style.top  = top + 'px';
+        card.style.transform = `rotate(${jitter}deg)`;
+        card.style.zIndex = String(10 + i);
+        container.appendChild(card);
+      }
+      const badge = document.createElement('div'); badge.className = 'pile-count'; badge.textContent = String(capped); container.appendChild(badge);
+    }
+
+    // Estado por fila { pref: 'a'|'b'|null, count: number }
+    const rowsState = [];
+
+    function buildRow(rowIndex, idxA, idxB){
+      const grid = document.getElementById('pairsGrid');
+      const row  = document.createElement('div');
+      row.className = 'pair-row';
+
+      // Preferida
+      const choices = document.createElement('div'); choices.className = 'pref-choices';
+      const leftLabel  = document.createElement('label');
+      const rightLabel = document.createElement('label');
+
+      const leftRadio  = document.createElement('input'); leftRadio.type='radio'; leftRadio.name=`pref-${rowIndex}`; leftRadio.value='a';
+      const rightRadio = document.createElement('input'); rightRadio.type='radio'; rightRadio.name=`pref-${rowIndex}`; rightRadio.value='b';
+
+      const leftText = document.createElement('span'); leftText.className = 'movie-chip'; leftText.textContent = movieLabel(idxA); leftText.title = movies[idxA] || '';
+      const rightText= document.createElement('span'); rightText.className= 'movie-chip'; rightText.textContent = movieLabel(idxB); rightText.title = movies[idxB] || '';
+
+      leftLabel.append(leftRadio, leftText); rightLabel.append(rightRadio, rightText);
+      choices.append(leftLabel, rightLabel);
+
+      // Mazo
+      const pile = document.createElement('div'); pile.className = 'card-pile';
+
+      // Controles
+      const ctrls = document.createElement('div'); ctrls.className = 'controls';
+      const minus = document.createElement('button'); minus.className='ctrl-btn'; minus.textContent='−';
+      const input = document.createElement('input'); input.className='ctrl-input'; input.type='number'; input.min='0'; input.max='50'; input.step='1'; input.value='0';
+      const plus  = document.createElement('button'); plus.className='ctrl-btn'; plus.textContent='+';
+      ctrls.append(minus, input, plus);
+
+      // Ensamblado
+      row.append(choices, pile, ctrls);
+      grid.appendChild(row);
+
+      rowsState[rowIndex] = { pref: null, count: 0, a: idxA, b: idxB };
+      renderPile(pile, 0);
+      setControlsEnabled(false);
+
+      function clamp(v){ v = parseInt(v||'0',10); if (isNaN(v)) v=0; return Math.max(0, Math.min(50, v)); }
+      function setControlsEnabled(enabled){ minus.disabled = !enabled; input.disabled = !enabled; plus.disabled = !enabled; }
+      function onPrefChange(side){ rowsState[rowIndex].pref = side; rowsState[rowIndex].count = 0; input.value='0'; renderPile(pile, 0); setControlsEnabled(!!side); }
+      function onCountChange(){ const c = clamp(input.value); input.value = c; rowsState[rowIndex].count = c; renderPile(pile, c); }
+
+      leftRadio.addEventListener('change', ()=>{ if (leftRadio.checked) onPrefChange('a'); });
+      rightRadio.addEventListener('change', ()=>{ if (rightRadio.checked) onPrefChange('b'); });
+      minus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur>0){ input.value = cur-1; onCountChange(); }});
+      plus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur<50){ input.value = cur+1; onCountChange(); }});
+      input.addEventListener('input', onCountChange);
+    }
+
+    function buildAllRows(){
+      const grid = document.getElementById('pairsGrid');
+      grid.innerHTML = '';
+      for (let k=0; k<order.length-1; k++){
+        const a = order[k], b = order[k+1];
+        buildRow(k, a, b);
+      }
+    }
+
+    function onSave(){
+      // Exportamos resultados: [{a,b,preferred:'a'|'b'|null,count}]
+      const result = rowsState.map(r => ({ a: r.a, b: r.b, preferred: r.pref, count: r.count }));
+      localStorage.setItem('sequentialComparisons', JSON.stringify(result));
+      // Puedes recalcular ranking en step6.html a partir de estas comparaciones, o fusionarlas con L
+      window.location.href = 'step6.html';
+    }
+
+    function init(){
+      if (window.TTM?.refresh) window.TTM.refresh();
+      setIntro();
+      buildAllRows();
+      document.getElementById('saveBtn').addEventListener('click', onSave);
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
 </html>
