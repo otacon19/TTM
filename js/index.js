@@ -22,7 +22,15 @@
         movies_label: "Movies",
         movie_placeholder: "Movie {i}",
         step3_choose_preferred: "Choose which movie you prefer (left or right). Then add 0–50 cards to express how strong that preference is. If you do not choose and leave 0 cards, it's a tie.",
-        
+        step4_title: "Preference gaps (cards)",
+        step4_description: "We show the number of cards (gap) between consecutive movies in your final ranking: 1st–2nd, 2nd–3rd, and so on. More cards ⇒ larger preference gap.",
+        step4_preference: "How satisfied are you with the result?",
+        step4_satisfaction_label: "Satisfaction degree: {label}",
+        send_button: "Send",
+        vs_label: "vs",
+        step4_tie_prefix: "It's a tie between",
+        step4_wins_connector: "wins against",
+        step4_and: "and",
       },
       es: {
         title: "Tournament Tree Model · Encuesta",
@@ -38,6 +46,15 @@
         movies_label: "Películas",
         movie_placeholder: "Película {i}",
         step3_choose_preferred: "Elige qué película prefieres (izquierda o derecha). Después añade entre 0 y 50 cartas para indicar la intensidad. Si no eliges y dejas 0 cartas, es un empate.",
+        step4_title: "Brechas de preferencia (cartas)",
+        step4_description: "Mostramos el número de cartas (brecha) entre películas consecutivas en tu ranking final: 1ª–2ª, 2ª–3ª, etc. Más cartas ⇒ mayor diferencia de preferencia.",
+        step4_preference: "¿Cómo de satisfecho estás con el resultado?",
+        step4_satisfaction_label: "Grado de satisfacción: {label}",
+        send_button: "Enviar",
+        vs_label: "vs",
+        step4_tie_prefix: "Hay empate entre",
+        step4_wins_connector: "gana a",
+        step4_and: "y",
       },
     };
   

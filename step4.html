@@ -1,333 +1,348 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TTM comparison</title>
-    <style>
-        body, html {
-            font-family: 'Lato', sans-serif;
-            background-color: #f5f5f5;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTM · Step 4</title>
 
-        .container {
-            text-align: justify;
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 1600px;
-        }
+  <!-- Tipografías + estilos comunes -->
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <meta name="theme-color" content="#3498db" />
 
-        h1 {
-            color: #333;
-            font-size: 2.5rem;
-        }
+  <style>
+    .diff-list { display: grid; gap: 18px; margin-top: 8px; }
+    .diff-row {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+      align-items: center;
+      justify-items: center;
+    }
+    .sentence { font-size: 15px; color: #374151; text-align: center; }
 
-        p {
-            color: #666;
-            font-size: 1.0rem;
-            margin-top: 10px;
-        }
+    .movie-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16,24,40,.06);
+      font-size: 14px;
+      color: #374151;
+      cursor: help; /* tooltip */
+    }
 
-        .navigate-button {
-            width: 200px;
-            height: 50px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-        }
+    .pile-wrap { display: flex; justify-content: center; }
+    .card-pile {
+      position: relative;
+      width: 640px;   /* ajusta si quieres */
+      height: 180px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 8px;
+      overflow: hidden;
+    }
+    .pile-count {
+      position: absolute;
+      bottom: 8px; right: 10px;
+      font-size: 12px;
+      color: #374151;
+      background: rgba(255,255,255,.9);
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+    }
 
-        .navigate-button:hover {
-            background-color: #2980b9;
-        }
-        
-        .navigate-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
+    .card-tile {
+      position: absolute;
+      width: 90px; height: 128px;
+      border-radius: 10px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 6px 14px rgba(0,0,0,.10);
+      transform-origin: 50% 80%;
+      user-select: none;
+    }
+    .card-face { position: absolute; inset: 6px; border-radius: 8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9)); }
+    .card-rank, .card-suit { position: absolute; font-size: 14px; font-weight: 700; line-height: 1; }
+    .card-rank { top: 6px; left: 8px; }
+    .card-suit { bottom: 6px; right: 8px; transform: rotate(180deg); }
+    .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
+    .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
 
-        .main-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            margin: 0 auto;
-        }
+    .controls { display: flex; gap: 8px; align-items: center; justify-content: center; }
+    .ctrl-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .ctrl-input { width: 72px; height: 36px; text-align: center; border-radius: 8px; border: 1px solid #d1d5db; }
 
-        .column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%; 
-            max-width: 500px; 
-            padding: 20px;
-        }
-
-        .column .title {
-            font-size: 16px;
-            margin-bottom: 10px;
-            text-align: center;
-            width: 100%;
-        }
-        
-        .column p {
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-
-        .row {
-            display: grid;
-            grid-template-columns: 200px 1fr;
-            gap: 10px;
-            align-items: center;
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .row strong {
-            text-align: right;
-            padding-right: 10px;
-            font-weight: bold;
-        }
-
-        .row input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        }
-
-        #title {
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .satisfaction-slider {
-            width: 300px;
-        }
-        
-        .satisfaction-level {
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-          
-    </style>
+    .footer { margin-top: 24px; display: grid; justify-items: center; gap: 10px; }
+    .navigate-button { width: 220px; height: 46px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1 id="title">Preferences values</h1>
-        <p id="description">Here you can see the preference values of each of the movies obtained from your comparisons. We would like to know if you think the values adequately represent your preferences about the movies and to what degree. Keep in mind that the higher the value the greater your preference for the movie.</p>
-            <div class="main-container" id="main-container"> </div>
-            <div class="column" id="column">
-            </div>
-            <div class="slider-container">
-                <p id="preference">How satisfied are you with the preference values?</p>
-                <input type="range" id="satisfactionSlider" class="satisfaction-slider" min="1" max="5" step="1" value="3" oninput="updateSatisfactionLevel()">
-                <div class="satisfaction-level" id="satisfactionLevel">Satisfaction Level:</div>
-            </div>
-            <p><center><button class="navigate-button" id="sendButton" onclick="saveScores(scoresTTM)">Send</button></center></p>
-    <script>
+  <!-- Logo fijo fuera de la tarjeta -->
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
 
-        const translations = {
-            en: {
-                title:"Preferences values",
-                description: "Here you can see the preference values of each of the movies obtained from your comparisons. We would like to know if you think the values adequately represent your preferences about the movies and to what degree. Keep in mind that the higher the value the greater your preference for the movie.",
-                preference:"How satisfied are you with the preference values?",
-                satisfactionLevel:"Satisfaction degree: ",
-                sendButton: "Send",
-            },
-            es: {
-                title:"Valores de preferencia",
-                description: "A continuación puede ver los valores de preferencia de cada película obtenidos a partir de sus comparaciones. Nos gustaría saber si los valores representan adecuadamente sus preferencias y en qué grado. Tenga en cuenta que, cuanto mayor es el valor, mayor es la preferencia sobre la película",
-                preference:"¿Cómo de satisfecho está con los valores de preferencia?",
-                satisfactionLevel:"Grado de satisfacción: ",
-                sendButton: "Enviar",
-            }
-        };
+  <!-- Selector de idioma -->
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
 
-        const satisfactionLevels = {
-            en: {
-                1: "Very bad",
-                2: "Bad",
-                3: "Neutral",
-                4: "Good",
-                5: "Very good"
-            },
-            es: {
-                1: "Muy malo",
-                2: "Malo",
-                3: "Medio",
-                4: "Bueno",
-                5: "Muy bueno"
-            }
-        };
+  <!-- Contenido principal -->
+  <main class="card" role="main">
+    <!-- Sin título/cabecera -->
 
-        function changeLanguage(language) {
-            document.getElementById('title').textContent = translations[language].title;
-            document.getElementById('description').textContent = translations[language].description;
-            document.getElementById('preference').textContent = translations[language].preference;
-            document.getElementById('sendButton').textContent = translations[language].sendButton;
-            updateSatisfactionLevel();
+    <div id="diffList" class="diff-list"></div>
+
+    <div class="footer">
+      <button class="btn navigate-button" id="sendButton" data-i18n="send_button">Send</button>
+    </div>
+  </main>
+
+  <!-- i18n + UX común -->
+  <script src="js/index.js"></script>
+
+  <!-- Lógica específica Step 4 -->
+  <script>
+    // ===== Utilidades i18n =====
+    function t(key, data={}) {
+      if (window.TTM?.t) {
+        const str = window.TTM.t(key) || '';
+        return str.replace(/\{(\w+)\}/g, (_,k) => (data[k] != null ? String(data[k]) : `{${k}}`));
+      }
+      return key;
+    }
+    function movieChip(idx){
+      const span = document.createElement('span');
+      span.className = 'movie-chip';
+      const label = t('movie_placeholder').replace('{i}', String(idx+1)); // <- usas movie_placeholder
+      span.textContent = label;
+      span.title = movies[idx] || '';
+      return span;
+    }
+
+    // ===== Datos previos =====
+    const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
+    const n = movies.length;
+    const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
+
+    // ===== Reconstrucción y scores =====
+    function generatePR(L) {
+      const A = Array.from({length:n}, ()=>Array(n).fill(0));
+      const N = Array.from({length:n}, ()=>Array(n).fill(0));
+      for (let i=0;i<n;i++){ A[i][i]=0; N[i][i]=1; }
+
+      for (let i=0;i<Math.min(L.length, n); i++) {
+        const r1 = Math.floor(L[i][0]);
+        const r2 = Math.floor(L[i][1]);
+        const value = L[i][2] || 0;
+        A[r1][r2] = value;
+        A[r2][r1] = -value;
+        N[r1][r2] = 1; N[r2][r1] = 1;
+      }
+
+      const w = Math.floor(L[Math.max(0, n-2)]?.[0] || 0);
+      for (let i=0; i<n-1; i++) {
+        const li  = Math.floor(L[Math.max(0, n-2-i)]?.[1] || 0);
+        const idx = Math.floor(L[Math.max(0, n-2-i)]?.[0] || 0);
+        if (N[w][li] === 0) {
+          A[w][li] = A[w][idx] + A[idx][li];
+          A[li][w] = -A[w][li];
+          N[w][li] = N[li][w] = 1;
         }
-        
-        let scoresTTM;
-        let preference;
-
-        const n = Number(localStorage.getItem('n'));      
-        const movies = localStorage.getItem('movies');
-        
-        function stringToMatrix(matrixText) {
-            const trimmedText = matrixText.trim();
-            const rows = trimmedText.split(';');
-            const matrix = rows.map(row => row.split(' ').map(Number));
-            return matrix;
+      }
+      for (let i=0;i<n-1;i++){
+        for (let j=i+1;j<n;j++){
+          if (N[i][j] === 0){
+            A[i][j] = A[i][w] + A[w][j];
+            A[j][i] = -A[i][j];
+            N[i][j] = N[j][i] = 1;
+          }
         }
+      }
+      return A;
+    }
 
-        function updateSatisfactionLevel() {
-            const language = localStorage.getItem('language');
-            const sliderValue = document.getElementById("satisfactionSlider").value;
-            document.getElementById("satisfactionLevel").textContent = translations[language].satisfactionLevel + satisfactionLevels[language][sliderValue];
-        }
+    function calculateScores(matrix) {
+      let max = -Infinity, colIndex = -1;
+      matrix.forEach(row => row.forEach((val,j)=> { if (val > max){ max=val; colIndex=j; } }));
+      const column = matrix.map(row => row[colIndex]);
+      return { max, column };
+    }
 
-        function generateFPR(L) {
+    // ===== Cartas =====
+    const SUITS = [
+      {s:'♠', cls:'suit-black'},
+      {s:'♣', cls:'suit-black'},
+      {s:'♥', cls:'suit-red'},
+      {s:'♦', cls:'suit-red'},
+    ];
+    const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
 
-            let A = new Array(n).fill(null).map(() => new Array(n).fill(0));
-            let N = new Array(n).fill(null).map(() => new Array(n).fill(0));
+    function makeCard(i){
+      const div = document.createElement('div');
+      div.className = 'card-tile';
+      const face = document.createElement('div'); face.className = 'card-face';
+      const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
+      const rank = RANKS[Math.floor(Math.random()*RANKS.length)];
+      div.classList.add(suit.cls);
+      const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
+      const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
+      face.append(rEl, sEl); div.appendChild(face);
+      return div;
+    }
 
-            for (let i = 0; i < n; i++) {
-                A[i][i] = 0.5;
-                N[i][i] = 1;
-            }
+    function renderPile(container, count){
+      container.innerHTML = '';
+      const MAX_CARDS = 200;
+      const capped = Math.min(MAX_CARDS, Math.max(0, Math.round(count)));
 
-            for (let i = 0; i < n; i++) {
-                const rowIndex1 = Math.floor(L[i][0]);
-                const rowIndex2 = Math.floor(L[i][1]);
-                const value = L[i][2];
+      const PADDING = 8;
+      const CARD_W = 90, CARD_H = 128;
+      const STEP_X = 22, STEP_Y = 6;
 
-                A[rowIndex1][rowIndex2] = value;
-                A[rowIndex2][rowIndex1] = 1 - value;
-                N[rowIndex1][rowIndex2] = 1;
-                N[rowIndex2][rowIndex1] = 1;
-            }
+      const innerW = container.clientWidth - 2*PADDING;
+      const innerH = container.clientHeight - 2*PADDING;
+      const cols = Math.max(1, Math.floor(innerW / STEP_X) + 1);
+      const maxTop = innerH - CARD_H;
 
-            // Select the last winner
-            let w = Math.floor(L[n-2][0]);    
-            let li = 0;
-            let index1 = 0;
+      for (let i = 0; i < capped; i++) {
+        const col = Math.min(i % cols, Math.floor((innerW - CARD_W) / STEP_X));
+        const row = Math.floor(i / cols);
+        const left = PADDING + Math.min(col * STEP_X, innerW - CARD_W);
+        const top  = PADDING + Math.min(row * STEP_Y, Math.max(0, maxTop));
 
-            for (let i = 0; i < n - 1; i++) {
+        const card = makeCard(i);
+        const jitter = (Math.random()*6 - 3);
+        card.style.left = left + 'px';
+        card.style.top  = top + 'px';
+        card.style.transform = `rotate(${jitter}deg)`;
+        card.style.zIndex = String(10 + i);
+        container.appendChild(card);
+      }
 
-                li = Math.floor(L[n - 2 - i][1]);
-                index1 = Math.floor(L[n - 2 - i][0]);
+      const badge = document.createElement('div');
+      badge.className = 'pile-count';
+      badge.textContent = String(capped);
+      container.appendChild(badge);
+    }
 
-                if (N[w][li] === 0) {
-                    A[w][li] = A[w][index1] + A[index1][li] - 0.5;
-                    A[li][w] = 1 - A[w][li];
-                    N[w][li] = 1;
-                    N[li][w] = 1;
-                }
-            }
+    // ===== Frases y controles =====
+    function buildSentenceWin(idxA, idxB){
+      const sentence = document.createElement('div');
+      sentence.className = 'sentence';
+      const chipA = movieChip(idxA);
+      const chipB = movieChip(idxB);
+      sentence.append(chipA, document.createTextNode(' ' + t('step4_wins_connector') + ' '), chipB);
+      return sentence;
+    }
+    function buildSentenceTie(idxA, idxB){
+      const sentence = document.createElement('div');
+      sentence.className = 'sentence';
+      const chipA = movieChip(idxA);
+      const chipB = movieChip(idxB);
+      sentence.append(document.createTextNode(t('step4_tie_prefix') + ' '), chipA, document.createTextNode(' ' + t('step4_and') + ' '), chipB);
+      return sentence;
+    }
 
-            for (let i = 0; i < n - 1; i++) {
-                for (let j = i + 1; j < n; j++) {
-                    if (N[i][j] === 0) {
-                        A[i][j] = A[i][w] + A[w][j] - 0.5;
-                        A[j][i] = 1 - A[i][j];
-                        N[i][j] = 1;
-                        N[j][i] = 1;
-                    }
-                }
-            }
+    // Estado editable por fila (guardamos la diff actual)
+    let scoresTTM = { max: 0, column: [] };
+    let diffsPayload = []; // {a, b, diff}
 
-            return A;
-        }
+    function clamp(v){ v = parseInt(v||'0',10); if (isNaN(v)) v=0; return Math.max(0, Math.min(50, v)); }
 
-        function calculateScores(matrix) {
-            return matrix.map(row => {
-                const sum = row.reduce((acc, val) => acc + val, 0);
-                return Math.round(sum / row.length * 100) / 100;
-            });
-        }
- 
-        document.addEventListener("DOMContentLoaded", function() {
-            const savedLanguage = localStorage.getItem('language') || 'en';
-            changeLanguage(savedLanguage);
+    function buildDiffRow(rowIndex, idxA, idxB, initialDiff){
+      const row = document.createElement('div');
+      row.className = 'diff-row';
 
-            const container = document.getElementById('main-container');
-            const column = document.getElementById('column');
+      // Frase dinámica
+      let sentence = (initialDiff > 0) ? buildSentenceWin(idxA, idxB) : buildSentenceTie(idxA, idxB);
 
-            const moviesValues = movies.split(',');
-            
-            const L_string = localStorage.getItem('matrixL');
-            const L_matrix = stringToMatrix(L_string);
-            
-            const A = generateFPR(L_matrix);
-            scoresTTM = calculateScores(A);
+      // Mazo
+      const pileWrap = document.createElement('div'); pileWrap.className = 'pile-wrap';
+      const pile = document.createElement('div'); pile.className = 'card-pile';
+      pileWrap.appendChild(pile);
 
-            for (let i = 0; i < moviesValues.length; i++) {
-                    
-                const row = document.createElement('div');
-                row.classList.add('row');
-                    
-                const movieTextNode = document.createElement('strong');
-                movieTextNode.textContent = moviesValues[i];
-                row.appendChild(movieTextNode);
+      // Controles
+      const ctrls = document.createElement('div'); ctrls.className = 'controls';
+      const minus = document.createElement('button'); minus.className = 'ctrl-btn'; minus.textContent = '−';
+      const input = document.createElement('input');  input.className = 'ctrl-input'; input.type = 'number'; input.min = '0'; input.max = '50'; input.step = '1'; input.value = String(initialDiff);
+      const plus  = document.createElement('button'); plus.className  = 'ctrl-btn'; plus.textContent = '+';
+      ctrls.append(minus, input, plus);
 
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.disabled = true;
-                input.className = 'text-box';
-                input.value = scoresTTM[i];
-                     
-                row.appendChild(input);
-                column.appendChild(row);      
-            }
-            
-            container.appendChild(column);
-        });
+      row.append(sentence, pileWrap, ctrls);
+      document.getElementById('diffList').appendChild(row);
 
+      // Estado
+      diffsPayload[rowIndex] = { a: idxA, b: idxB, diff: clamp(initialDiff) };
+      renderPile(pile, diffsPayload[rowIndex].diff);
 
-        //http://localhost:5501/save-scores
-        function saveScores(scoresTTM) {
-            const satisfactionSlider = document.getElementById('satisfactionSlider');
-            let degree = satisfactionSlider.value;
-            let user_name = localStorage.getItem('user_name');
+      function refreshSentence(){
+        const newSentence = (diffsPayload[rowIndex].diff > 0) ? buildSentenceWin(idxA, idxB) : buildSentenceTie(idxA, idxB);
+        sentence.replaceWith(newSentence);
+        sentence = newSentence;
+      }
+      function onChange(){
+        const v = clamp(input.value);
+        input.value = v;
+        diffsPayload[rowIndex].diff = v;
+        renderPile(pile, v);
+        refreshSentence();
+      }
+      minus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur>0){ input.value = cur-1; onChange(); }});
+      plus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur<50){ input.value = cur+1; onChange(); }});
+      input.addEventListener('input', onChange);
+    }
 
-            fetch('/save-scores', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ user_name, scoresTTM, degree })
-            })
-            .then(response => response.text())
-            .then(data => { console.log('Success:', data); })
-            .catch((error) => { console.error('Error:', error); });
+    function init(){
+      if (window.TTM?.refresh) window.TTM.refresh();
 
-            window.location.href = `step5.html`;
-        }
+      // 1) Reconstruir A y calcular column
+      const A = generatePR(L);
+      scoresTTM = calculateScores(A);
+      const column = scoresTTM.column.slice();
 
-    </script>
+      // 2) Índices best->worst
+      const idxs = Array.from({length:n}, (_,i)=>i).sort((a,b)=> column[b]-column[a]);
+
+      // 3) Pintar diferencias consecutivas con controles
+      const list = document.getElementById('diffList');
+      list.innerHTML = '';
+      diffsPayload = [];
+      for (let k = 0; k < idxs.length - 1; k++) {
+        const a = idxs[k], b = idxs[k+1];
+        const diff = Math.max(0, Math.round(column[a] - column[b])); // inicial
+        buildDiffRow(k, a, b, diff);
+      }
+
+      document.getElementById('sendButton').addEventListener('click', onSend);
+    }
+
+    function onSend(){
+      const user_name = localStorage.getItem('user_name') || '';
+      const payload = { user_name, column: scoresTTM.column, diffs: diffsPayload };
+      fetch('/save-scores', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      }).catch(err => console.error('save-scores error', err));
+      window.location.href = 'step5.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>

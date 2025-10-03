@@ -119,14 +119,11 @@
     const textValues = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
     const n = textValues.length;
 
-    const M_fpr = Array.from({length: n}, () => Array.from({length: n}, () => 0));
-    for (let i = 0; i < n; i++) M_fpr[i][i] = 0.5;
-    const M_saaty = Array.from({length: n}, () => Array.from({length: n}, () => '1'));
-
     let L = Array.from({length: n}, () => Array(3).fill(0.0));
     let Lindex = 0;
 
     function half(x){ return [Math.floor(x/2), x % 2]; }
+    
     function comparisons(n){
       const nRounds = Math.ceil(Math.log2(n));
       const arr = new Array(nRounds).fill(0);
@@ -134,6 +131,7 @@
       while(!(C === 1 && R === 0)) { r++; [C, R] = half(C + R); arr[r] = C; }
       return arr.map(Math.floor);
     }
+
     const comp = comparisons(n);
 
     let winList = Array.from({length: n}, (_, i) => i);
@@ -169,7 +167,7 @@
 
     function renderPile(container, count){
       container.innerHTML = '';
-      const MAX_CARDS = 50;
+      const MAX_CARDS = 200;
       const capped = Math.min(MAX_CARDS, Math.max(0, parseInt(count||'0',10)));
 
       const PADDING = 12;
@@ -238,11 +236,13 @@
         if (isNaN(v)) v = 0;
         return Math.max(0, Math.min(50, v));
       }
+
       function setControlsEnabled(enabled) {
         minus.disabled = !enabled;
         input.disabled = !enabled;
         plus.disabled  = !enabled;
       }
+
       function onPrefChange(side){
         rowsState[rowIndex].pref = side;
         rowsState[rowIndex].count = 0;
@@ -251,6 +251,7 @@
         setControlsEnabled(!!side);
         updateProgress();
       }
+
       function onCountChange(){
         const c = clamp(input.value);
         input.value = c;
@@ -276,32 +277,19 @@
       nextButton.disabled  = lastRound ? false : true;
     }
 
-    function diffToSaaty(left, right){
-      const diff = Math.abs(left - right);
-      return Math.min(9, 1 + diff);
-    }
-    function transformScale(value){ return 0.5 + 0.5 * Math.log(value)/Math.log(9); }
-
     function updateMatricesForPair(aIndex, bIndex, prefSide, count){
       const a = winList[aIndex], b = winList[bIndex];
 
       if (!prefSide || count === 0){
-        M_saaty[a][b] = '1'; M_saaty[b][a] = '1';
-        M_fpr[a][b] = 0.5;   M_fpr[b][a] = 0.5;
-        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = 0.5;
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = count;
         newWinList.push(a); // pasa arbitrariamente 'a' en empate
         Lindex++; return;
       }
 
-      const m = diffToSaaty(count, 0); // diff = count
       if (prefSide === 'left'){
-        M_saaty[a][b] = String(m);     M_saaty[b][a] = m === 1 ? '1' : `1/${m}`;
-        const val = transformScale(m);  M_fpr[a][b] = val; M_fpr[b][a] = 1 - val;
-        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = val; newWinList.push(a);
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = count + 1; newWinList.push(a);
       } else {
-        M_saaty[a][b] = m === 1 ? '1' : `1/${m}`; M_saaty[b][a] = String(m);
-        const val = transformScale(m);           M_fpr[a][b] = 1 - val; M_fpr[b][a] = val;
-        L[Lindex][0] = b; L[Lindex][1] = a; L[Lindex][2] = val; newWinList.push(b);
+        L[Lindex][0] = b; L[Lindex][1] = a; L[Lindex][2] = count + 1; newWinList.push(b);
       }
       Lindex++;
     }
@@ -331,14 +319,10 @@
       if (round < comp.length) runRound();
       L[Lindex][0] = winList[winList.length-1];
       L[Lindex][1] = winList[winList.length-1];
-      L[Lindex][2] = 0.5;
+      L[Lindex][2] = 0;
 
-      const matrixText = L.map(row => row.join(' ')).join(';') + '\n';
-      localStorage.setItem('matrixL', matrixText);
-
-      const encodedFPRMatrix = encodeURIComponent(JSON.stringify(M_fpr));
-      const encodedSaatyMatrix = encodeURIComponent(JSON.stringify(M_saaty));
-      window.location.href = `step4.html?matrixFPR=${encodedFPRMatrix}&matrixSaaty=${encodedSaatyMatrix}`;
+      localStorage.setItem('matrixL', JSON.stringify(L));
+      window.location.href = "step4.html";
     }
 
     document.addEventListener('DOMContentLoaded', () => {
