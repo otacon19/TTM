@@ -11,7 +11,7 @@
     }
   
     function movieLabel(i) {
-      const tmpl = t('movie_placeholder') || 'Movie {i}';
+      const tmpl = t('movie_placeholder') || 'Object {i}';
       return tmpl.replace('{i}', String(i + 1));
     }
   
