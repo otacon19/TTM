@@ -1,0 +1,213 @@
+.panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+  }
+  
+  .panel h2 {
+    margin: 0 0 6px;
+    font-size: 17px;
+  }
+  
+  .lead {
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+  }
+  
+  .rank-table th,
+  .rank-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+  }
+  
+  .rank-table th {
+    font-weight: 700;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .rank-num {
+    width: 52px;
+    color: #6b7280;
+  }
+  
+  .movie-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16,24,40,.06);
+    font-size: 13px;
+    color: #374151;
+    cursor: help;
+  }
+  
+  .questions {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  
+  .question {
+    display: grid;
+    gap: 6px;
+    transition: opacity .3s ease, filter .3s ease;
+  }
+  
+  .inline-opts {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .disabled-question {
+    opacity: 0.45;
+    pointer-events: none;
+    filter: grayscale(0.4);
+  }
+  
+  .hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 12px;
+  }
+  
+  .navigate-button {
+    width: 200px;
+    height: 42px;
+  }
+  
+  #cardsFieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  
+  /* Layout a dos columnas con sticky en preguntas */
+.step4-layout {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+  }
+  
+  @media (max-width: 980px) {
+    .step4-layout { grid-template-columns: 1fr; }
+    .sticky-qa { position: static; top: auto; }
+  }
+  
+  /* Paneles tal y como ya usas */
+  .panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+  }
+  
+  .panel h2 {
+    margin: 0 0 6px;
+    font-size: 17px;
+  }
+  
+  /* izquierda: ranking con scroll interno */
+  .rank-scroll {
+    max-height: min(60vh, 560px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    border-radius: 10px;
+  }
+  
+  /* sticky de la columna derecha */
+  .sticky-qa {
+    position: sticky;
+    top: 16px;
+    align-self: start;
+  }
+  
+  /* tabla (hereda tu estilo previo) */
+  .rank-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .rank-table th,
+  .rank-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid #f1f5f9;
+    text-align: left;
+  }
+  
+  .rank-table th {
+    font-weight: 700;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  
+  .rank-num { width: 52px; color: #6b7280; }
+  
+  /* chips de película */
+  .movie-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border: 1px solid #e5e7eb;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(16,24,40,.06);
+    font-size: 13px;
+    color: #374151;
+    cursor: help;
+  }
+  
+  /* preguntas */
+  .questions { display: grid; gap: 10px; margin-top: 10px; }
+  .question  { display: grid; gap: 6px; }
+  .inline-opts { display: flex; gap: 10px; align-items: center; }
+  .hint { font-size: 12px; color: #6b7280; }
+  
+  /* CTA */
+  .actions { display: flex; justify-content: center; margin-top: 12px; }
+  .navigate-button { width: 200px; height: 42px; }
+  
+  /* sin borde en fieldset de cartas, como pediste antes */
+  #cardsFieldset { border: 0; padding: 0; margin: 0; }
+  
+  /* --- micro-barra en “Escala de valores” --- */
+  .util-cell {
+    display: grid;
+    grid-template-columns: 1fr auto; /* barra a la izq, número a la dcha */
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .util-bar-wrap {
+    height: 6px;
+    background: #f3f4f6;
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  
+  .util-bar {
+    height: 100%;
+    width: 0%;
+    background: #3498db;           /* tu primario */
+    transition: width .4s ease;
+  }
+  

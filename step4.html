@@ -6,56 +6,20 @@
   <title>TTM · Step 4 (Review)</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/step4.css" />
   <meta name="theme-color" content="#3498db" />
-
-  <style>
-    .layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
-    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
-    .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; }
-    .panel h2 { margin: 0 0 6px; font-size: 17px; }
-    .lead { color: var(--muted); margin-top: 4px; }
-
-    .rank-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    .rank-table th, .rank-table td { padding: 8px 6px; border-bottom: 1px solid #f1f5f9; text-align: left; }
-    .rank-table th { font-weight: 700; font-size: 13px; color: #6b7280; }
-    .rank-num { width: 52px; color: #6b7280; }
-
-    .movie-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border: 1px solid #e5e7eb; border-radius: 999px; background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.06); font-size: 13px; color: #374151; cursor: help; }
-
-    .diff-list { display: grid; gap: 10px; }
-    .diff-row { display: grid; grid-template-columns: 1fr; gap: 6px; justify-items: center; }
-    .sentence { font-size: 14px; color: #374151; text-align: center; }
-
-    .pile-wrap { display: flex; justify-content: center; }
-    .card-pile { position: relative; width: 480px; height: 150px; background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 10px; padding: 6px; overflow: hidden; }
-    .pile-count { position: absolute; bottom: 6px; right: 8px; font-size: 11px; color: #374151; background: rgba(255,255,255,.9); padding: 1px 6px; border-radius: 999px; border: 1px solid #e5e7eb; }
-
-    .card-tile { position: absolute; width: 72px; height: 102px; border-radius: 8px; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,.10); transform-origin: 50% 80%; user-select: none; }
-    .card-face { position: absolute; inset: 5px; border-radius: 6px; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(249,250,251,0.9)); }
-    .card-rank, .card-suit { position: absolute; font-size: 12px; font-weight: 700; line-height: 1; }
-    .card-rank { top: 5px; left: 6px; }
-    .card-suit { bottom: 5px; right: 6px; transform: rotate(180deg); }
-    .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
-    .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
-
-    .questions { display: grid; gap: 10px; margin-top: 10px; }
-    .question { display: grid; gap: 6px; }
-    .inline-opts { display: flex; gap: 10px; align-items: center; }
-    .note { font-size: 12px; color: #6b7280; }
-    fieldset[disabled] { opacity: .55; }
-
-    .actions { display: flex; justify-content: center; margin-top: 12px; }
-    .navigate-button { width: 200px; height: 42px; }
-  </style>
 </head>
+
 <body>
+  <!-- Logo -->
   <div class="site-logo">
     <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
       <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
     </a>
   </div>
 
+  <!-- Selector de idioma -->
   <div class="lang-switch" role="group" aria-label="Language selector">
     <button type="button" id="btn-en" title="English" aria-label="English">
       <img src="img/english.png" alt="English flag" />
@@ -65,236 +29,65 @@
     </button>
   </div>
 
+  <!-- Contenido principal -->
   <main class="card" role="main">
     <header class="page-header">
-      <h1 id="title" data-i18n="step4r_title">Review your ranking</h1>
+      <h1 id="title" data-i18n="step4r_title"></h1>
       <p id="intro" class="lead" data-i18n="step4r_intro"></p>
     </header>
-
-    <div class="layout">
-      <!-- Col izda: ranking + utilidades + preguntas -->
-      <section class="panel" aria-labelledby="rankingTitle">
-        <h2 id="rankingTitle" data-i18n="step4r_title">Review your ranking</h2>
-        <table class="rank-table" id="rankTable">
-          <thead>
-            <tr>
-              <th class="rank-num" data-i18n="step4r_col_rank">Rank</th>
-              <th data-i18n="step4r_col_movie">Movie</th>
-              <th data-i18n="step4r_col_utility">Utility</th>
-            </tr>
-          </thead>
-          <tbody id="rankBody"></tbody>
-        </table>
-
+  
+    <div class="step4-layout">
+      <!-- Izquierda: RANKING -->
+      <section class="panel panel-left" aria-labelledby="rankingTitle">
+        <h2 id="rankingTitle" data-i18n="step4r_col_title"></h2>
+  
+        <div class="rank-scroll">
+          <table class="rank-table" id="rankTable">
+            <thead>
+              <tr>
+                <th class="rank-num" data-i18n="step4r_col_rank">Rank</th>
+                <th data-i18n="step4r_col_movie">Movie</th>
+                <th data-i18n="step4r_col_scale">Escala de valores</th>
+              </tr>
+            </thead>
+            <tbody id="rankBody"></tbody>
+          </table>
+        </div>
+      </section>
+  
+      <!-- Derecha: PREGUNTAS / CTA -->
+      <aside class="panel panel-right sticky-qa" aria-labelledby="qaTitle">
+        <h2 id="qaTitle" data-i18n="step4r_title"></h2>
+  
         <div class="questions">
           <div class="question">
-            <label data-i18n="step4r_q_rank_ok">Are you satisfied with the ranking?</label>
+            <label data-i18n="step4r_q_rank_ok"></label>
             <div class="inline-opts">
-              <label><input type="radio" name="rankOk" value="yes"> <span data-i18n="step4r_yes">Yes</span></label>
-              <label><input type="radio" name="rankOk" value="no">  <span data-i18n="step4r_no">No</span></label>
+              <label><input type="radio" name="rankOk" value="yes"> <span data-i18n="step4r_yes"></span></label>
+              <label><input type="radio" name="rankOk" value="no">  <span data-i18n="step4r_no"></span></label>
             </div>
-            <div id="noteRecompare" class="note" style="display:none" data-i18n="step4r_logic_note_recompare"></div>
+            <div id="noteRecompare" class="hint" style="display:none" data-i18n="step4r_logic_note_recompare"></div>
           </div>
-
+  
           <fieldset id="cardsFieldset" class="question">
-            <label data-i18n="step4r_q_cards_ok">Are you satisfied with the number of cards (gaps)?</label>
+            <label data-i18n="step4r_q_cards_ok"></label>
             <div class="inline-opts">
-              <label><input type="radio" name="cardsOk" value="yes"> <span data-i18n="step4r_yes">Yes</span></label>
-              <label><input type="radio" name="cardsOk" value="no">  <span data-i18n="step4r_no">No</span></label>
+              <label><input type="radio" name="cardsOk" value="yes"> <span data-i18n="step4r_yes"></span></label>
+              <label><input type="radio" name="cardsOk" value="no">  <span data-i18n="step4r_no"></span></label>
             </div>
-            <div id="noteCardsDisabled" class="note" style="display:none" data-i18n="step4r_logic_note_cards_disabled"></div>
+            <div id="noteCardsDisabled" class="hint" style="display:none" data-i18n="step4r_logic_note_cards_disabled"></div>
           </fieldset>
         </div>
-
+  
         <div class="actions">
           <button id="continueBtn" class="btn navigate-button" data-i18n="step4r_continue">Continue</button>
         </div>
-      </section>
-
-      <!-- Col dcha: cartas (no editable) -->
-      <section class="panel" aria-labelledby="cardsTitle">
-        <h2 id="cardsTitle" data-i18n="step4r_cards_panel_title"></h2>
-        <div id="diffList" class="diff-list"></div>
-      </section>
+      </aside>
     </div>
   </main>
 
-  <script src="js/index.js"></script>
-
-  <script>
-    function t(key, data={}) {
-      if (window.TTM?.t) {
-        const str = window.TTM.t(key) || '';
-        return str.replace(/\{(\w+)\}/g, (_,k) => (data[k] != null ? String(data[k]) : `{${k}}`));
-      }
-      return key;
-    }
-    function movieLabel(i) { return (t('movie_placeholder') || 'Movie {i}').replace('{i}', String(i+1)); }
-
-    const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
-    const n = movies.length;
-    const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
-
-    function generatePR(L) {
-      const A = Array.from({length:n}, ()=>Array(n).fill(0));
-      const N = Array.from({length:n}, ()=>Array(n).fill(0));
-      for (let i=0;i<n;i++){ A[i][i]=0; N[i][i]=1; }
-      for (let i=0;i<Math.min(L.length, n); i++) {
-        const r1 = Math.floor(L[i][0]); const r2 = Math.floor(L[i][1]); const value = L[i][2] || 0;
-        A[r1][r2] = value; A[r2][r1] = -value; N[r1][r2]=N[r2][r1]=1;
-      }
-      const w = Math.floor(L[Math.max(0, n-2)]?.[0] || 0);
-      for (let i=0; i<n-1; i++) {
-        const li  = Math.floor(L[Math.max(0, n-2-i)]?.[1] || 0);
-        const idx = Math.floor(L[Math.max(0, n-2-i)]?.[0] || 0);
-        if (N[w][li] === 0) { A[w][li] = A[w][idx] + A[idx][li]; A[li][w] = -A[w][li]; N[w][li]=N[li][w]=1; }
-      }
-      for (let i=0;i<n-1;i++){ for (let j=i+1;j<n;j++){ if (N[i][j]=== 0){ A[i][j]=A[i][w]+A[w][j]; A[j][i]=-A[i][j]; N[i][j]=N[j][i]=1; } } }
-      return A;
-    }
-    function calculateScores(matrix) {
-      let max = -Infinity, colIndex = -1;
-      matrix.forEach(row => row.forEach((val,j)=> { if (val > max){ max=val; colIndex=j; } }));
-      const column = matrix.map(row => row[colIndex]);
-      return { max, column };
-    }
-
-    const SUITS = [{s:'♠',cls:'suit-black'},{s:'♣',cls:'suit-black'},{s:'♥',cls:'suit-red'},{s:'♦',cls:'suit-red'}];
-    const RANKS = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
-    function makeCard(i){
-      const div = document.createElement('div'); div.className = 'card-tile';
-      const face = document.createElement('div'); face.className = 'card-face';
-      const suit = SUITS[Math.floor(Math.random()*SUITS.length)];
-      const rank = RANKS[Math.floor(Math.random()*RANKS.length)];
-      div.classList.add(suit.cls);
-      const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
-      const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
-      face.append(rEl, sEl); div.appendChild(face); return div;
-    }
-    function renderPile(container, count){
-      container.innerHTML = '';
-      const MAX_CARDS = 50;
-      const capped = Math.min(MAX_CARDS, Math.max(0, Math.round(count)));
-      const PADDING = 6, CARD_W = 72, CARD_H = 102, STEP_X = 16, STEP_Y = 5;
-      const innerW = container.clientWidth - 2*PADDING;
-      const innerH = container.clientHeight - 2*PADDING;
-      const cols = Math.max(1, Math.floor(innerW / STEP_X) + 1);
-      const maxTop = innerH - CARD_H;
-      for (let i = 0; i < capped; i++) {
-        const col = Math.min(i % cols, Math.floor((innerW - CARD_W) / STEP_X));
-        const row = Math.floor(i / cols);
-        const left = PADDING + Math.min(col * STEP_X, innerW - CARD_W);
-        const top  = PADDING + Math.min(row * STEP_Y, Math.max(0, maxTop));
-        const card = makeCard(i);
-        const jitter = (Math.random()*5 - 2.5);
-        card.style.left = left + 'px'; card.style.top = top + 'px';
-        card.style.transform = `rotate(${jitter}deg)`; card.style.zIndex = String(10 + i);
-        container.appendChild(card);
-      }
-      const badge = document.createElement('div'); badge.className = 'pile-count';
-      badge.textContent = String(capped); container.appendChild(badge);
-    }
-    function chip(idx){ const el=document.createElement('span'); el.className='movie-chip'; el.textContent=movieLabel(idx); el.title=movies[idx]||''; return el; }
-    function buildSentenceWin(a,b){ const s=document.createElement('div'); s.className='sentence'; s.append(chip(a), document.createTextNode(' '+t('step4_wins_connector')+' '), chip(b)); return s; }
-    function buildSentenceTie(a,b){ const s=document.createElement('div'); s.className='sentence'; s.append(document.createTextNode(t('step4_tie_prefix')+' '), chip(a), document.createTextNode(' '+t('step4_and')+' '), chip(b)); return s; }
-
-    let scoresTTM = { max: 0, column: [] };
-    let utilities = [];
-    let order = [];
-
-    function updateQuestionsUI(){
-      const rankYes = document.querySelector('input[name="rankOk"][value="yes"]').checked;
-      const rankNo  = document.querySelector('input[name="rankOk"][value="no"]').checked;
-      const cardsFieldset = document.getElementById('cardsFieldset');
-      const noteRecompare = document.getElementById('noteRecompare');
-      const noteCardsDisabled = document.getElementById('noteCardsDisabled');
-      const continueBtn = document.getElementById('continueBtn');
-
-      if (rankNo){
-        // Deshabilitar cartas; mostrar notas; botón = Recomparar
-        cardsFieldset.disabled = true;
-        noteRecompare.style.display = 'block';
-        noteCardsDisabled.style.display = 'block';
-        continueBtn.textContent = t('step4r_continue_recompare');
-        continueBtn.setAttribute('data-next', 'recompare');
-      } else {
-        // Habilitar cartas; ocultar notas; botón depende de cartas
-        cardsFieldset.disabled = false;
-        noteRecompare.style.display = 'none';
-        noteCardsDisabled.style.display = 'none';
-        const cardsNo  = document.querySelector('input[name="cardsOk"][value="no"]').checked;
-        continueBtn.textContent = cardsNo ? t('step4r_continue_adjust') : t('step4r_continue_finish');
-        continueBtn.setAttribute('data-next', cardsNo ? 'adjust' : 'finish');
-      }
-    }
-
-    function init(){
-      if (window.TTM?.refresh) window.TTM.refresh();
-
-      // 1) Reconstruir y puntuar
-      const A = generatePR(L);
-      scoresTTM = calculateScores(A);
-      const column = scoresTTM.column.slice();
-      const max = Math.max(1, Math.abs(scoresTTM.max || 1));
-      utilities = column.map(v => (v / max));
-
-      // 2) Orden best->worst por column
-      order = Array.from({length:n}, (_,i)=>i).sort((a,b)=> column[b]-column[a]);
-      // tras calcular 'order' (best->worst)
-      localStorage.setItem('lastComputedOrder', JSON.stringify(order));
-
-
-      // 3) Tabla ranking
-      const tbody = document.getElementById('rankBody'); tbody.innerHTML = '';
-      order.forEach((idx, i) => {
-        const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
-        const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
-        const tdMovie= document.createElement('td'); const chipEl = document.createElement('span'); chipEl.className='movie-chip'; chipEl.textContent = movieLabel(idx); chipEl.title = movies[idx] || ''; tdMovie.appendChild(chipEl);
-        const tdUtil = document.createElement('td'); tdUtil.textContent = utilities[idx].toFixed(3);
-        tr.append(tdRank, tdMovie, tdUtil); tbody.appendChild(tr);
-      });
-
-      // 4) Panel cartas (no editable) — diferencias entre consecutivos
-      const diffList = document.getElementById('diffList'); diffList.innerHTML = '';
-      for (let k=0;k<order.length-1;k++){
-        const a = order[k], b = order[k+1];
-        const diff = Math.max(0, Math.round(column[a] - column[b]));
-        const row = document.createElement('div'); row.className='diff-row';
-        const sentence = diff>0 ? buildSentenceWin(a,b) : buildSentenceTie(a,b);
-        const pileWrap = document.createElement('div'); pileWrap.className='pile-wrap';
-        const pile = document.createElement('div'); pile.className='card-pile'; pileWrap.appendChild(pile);
-        row.append(sentence, pileWrap); diffList.appendChild(row);
-        renderPile(pile, diff);
-      }
-
-      // 5) Preguntas: por defecto Yes/Yes
-      document.querySelector('input[name="rankOk"][value="yes"]').checked = true;
-      document.querySelector('input[name="cardsOk"][value="yes"]').checked = true;
-      document.querySelectorAll('input[name="rankOk"]').forEach(el => el.addEventListener('change', updateQuestionsUI));
-      document.querySelectorAll('input[name="cardsOk"]').forEach(el => el.addEventListener('change', updateQuestionsUI));
-      updateQuestionsUI();
-
-      // 6) Continuar según lógica
-      document.getElementById('continueBtn').addEventListener('click', ()=>{
-        const next = document.getElementById('continueBtn').getAttribute('data-next');
-        if (next === 'recompare'){
-          // Guardamos una marca para el flujo de "recomparación secuencial"
-          localStorage.setItem('reviewDecision', 'recompare_sequential');
-          // Por claridad, usa una página específica para esas comparaciones secuenciales:
-          window.location.href = 'step5_compare.html';
-        } else if (next === 'adjust'){
-          localStorage.setItem('reviewDecision', 'adjust_cards');
-          // Tu pantalla de ajuste de cartas (antes era step4, ahora es step5):
-          window.location.href = 'step5.html';
-        } else {
-          localStorage.setItem('reviewDecision', 'finish');
-          // Siguiente paso/confirmación (ajústalo al nombre que uses):
-          window.location.href = 'step6.html';
-        }
-      });
-    }
-
-    document.addEventListener('DOMContentLoaded', init);
-  </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/step4.js"></script>
 </body>
 </html>

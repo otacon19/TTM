@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tournament Tree Model · Paso 1</title>
+  <title>TTM - Step 1</title>
 
   <!-- Tipografías + estilos comunes -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/style.css" />
 
   <meta name="theme-color" content="#3498db" />
 </head>
@@ -32,17 +32,14 @@
   <!-- Contenido principal -->
   <main class="card" role="main">
     <header class="page-header">
-      <h1 id="title">Tournament Tree Model · Step 1</h1>
+      <h1 id="title" data-i18n="step1_title"></h1>
     </header>
 
-    <!-- Descripción específica de este paso (i18n) -->
-    <p id="description" data-i18n="step1_description">
-      Introduce the number of movies to compare. Select between 4 and 6 movies.
-    </p>
+    <p id="description" data-i18n="step1_description"</p>
 
     <form class="form" id="form" data-next="step2.html" novalidate>
       <div class="field">
-        <label for="spinner" data-i18n="movies_number">Number of movies</label>
+        <label for="spinner" data-i18n="movies_number"></label>
         <input type="number" class="input" id="spinner" min="4" max="6" step="1" value="4" />
       </div>
 
@@ -53,7 +50,8 @@
   </main>
 
   <!-- Lógica común (i18n + UX) -->
-  <script src="js/index.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
   <script>
     // Lógica específica de este paso
     document.addEventListener('DOMContentLoaded', () => {

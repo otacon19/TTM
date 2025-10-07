@@ -3,23 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tournament Tree Model · Encuesta</title>
+  <title>TTM</title>
 
-  <!-- Tipografías y estilos comunes -->
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
-
+  <link rel="stylesheet" href="css/style.css" />
   <meta name="theme-color" content="#3498db" />
 </head>
 <body>
-  <!-- Logo fijo fuera de la tarjeta -->
   <div class="site-logo">
     <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
       <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
     </a>
   </div>
 
-  <!-- Selector de idioma -->
   <div class="lang-switch" role="group" aria-label="Language selector">
     <button type="button" id="btn-en" title="English" aria-label="English">
       <img src="img/english.png" alt="English flag" />
@@ -29,30 +25,30 @@
     </button>
   </div>
 
-  <!-- Contenido principal -->
   <main class="card" role="main">
     <header class="page-header">
-      <h1 id="title">Tournament Tree Model · Survey</h1>
+      <h1 id="title" data-i18n="index_title"></h1>
     </header>
 
-    <p id="description">
-      The purpose of this survey is to evaluate a preference collection methodology and check whether the results obtained are in line with the user's preferences. To do so, we will ask you to list your favorite movies and compare them with each other.
-    </p>
+    <p id="description" data-i18n="index_description"></p>
 
     <form class="form" id="form" novalidate>
       <div class="field">
-        <label for="name_box" id="name_label">Your name</label>
-        <input id="name_box" class="input" type="text" name="name" placeholder="Enter your name" autocomplete="name" required />
+        <label for="name_box" id="name_label" data-i18n="index_name_label"></label>
+        <input id="name_box" class="input" type="text" name="name"
+               data-i18n-placeholder="index_name_placeholder"
+               autocomplete="name" required />
       </div>
 
       <div class="actions">
-        <button id="nextButton" class="btn" type="submit">Next</button>
-        <span class="thanks" id="thanks">Thank you for participating in the survey!</span>
+        <button id="nextButton" class="btn" type="submit" data-i18n="index_next_button"></button>
+        <span class="thanks" id="thanks"></span>
       </div>
     </form>
   </main>
 
-  <!-- Lógica común (i18n + UX) -->
-  <script src="js/index.js"></script>
+  <!-- Importante: i18n primero, luego app -->
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
