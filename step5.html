@@ -329,7 +329,7 @@
           const a = orderEff[i], b = orderEff[i + 1];
           const c = cardsToNext.get(`${a}|${b}`) || 0;
           // Regla: última 0; prev = next + (c==0?0:(c+1)) para que 0 cartas no sume
-          accum[a] = (c === 0) ? accum[b] : (accum[b] + c + 1);
+          accum[a] = (accum[b] + c + 1);
         }
       }
 
