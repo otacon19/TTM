@@ -58,6 +58,33 @@
       return { max, column };
     }
 
+    // ==== Control de preguntas ====
+  function updateQuestionsUI() {
+    const rankNo = document.querySelector('input[name="rankOk"][value="no"]').checked;
+    const cardsFieldset = document.getElementById('cardsFieldset');
+    const noteRecompare = document.getElementById('noteRecompare');
+    const noteCardsDisabled = document.getElementById('noteCardsDisabled');
+    const continueBtn = document.getElementById('continueBtn');
+
+    if (rankNo) {
+      // si no está de acuerdo con ranking, ignoramos cartas aquí
+      cardsFieldset.classList.add('disabled-question');
+      cardsFieldset.disabled = true;
+      noteRecompare.style.display = 'block';
+      noteCardsDisabled.style.display = 'block';
+      continueBtn.textContent = t('step4r_continue_recompare');
+      continueBtn.setAttribute('data-next', 'edit_ranking');
+    } else {
+      cardsFieldset.classList.remove('disabled-question');
+      cardsFieldset.disabled = false;
+      noteRecompare.style.display = 'none';
+      noteCardsDisabled.style.display = 'none';
+      const cardsNo = document.querySelector('input[name="cardsOk"][value="no"]').checked;
+      continueBtn.textContent = cardsNo ? t('step4r_continue_adjust') : t('step4r_continue_finish');
+      continueBtn.setAttribute('data-next', cardsNo ? 'adjust' : 'finish');
+    }
+  }
+
     function init(){
       if(window.TTM?.refresh) window.TTM.refresh();
 
@@ -93,7 +120,16 @@
         tbody.appendChild(tr);
       }
 
-      document.getElementById('continueBtn').addEventListener('click', ()=>{
+       // Preguntas iniciales
+        document.querySelector('input[name="rankOk"][value="yes"]').checked = true;
+        document.querySelector('input[name="cardsOk"][value="yes"]').checked = true;
+
+        document.querySelectorAll('input[name="rankOk"]').forEach(el => el.addEventListener('change', updateQuestionsUI));
+        document.querySelectorAll('input[name="cardsOk"]').forEach(el => el.addEventListener('change', updateQuestionsUI));
+
+        updateQuestionsUI();
+
+        document.getElementById('continueBtn').addEventListener('click', ()=>{
         const rankOk = document.querySelector('input[name="rankOk"]:checked')?.value;
         const cardsOk = document.querySelector('input[name="cardsOk"]:checked')?.value;
 
@@ -105,7 +141,7 @@
           window.location.href = 'step5.html';
         } else {
           localStorage.setItem('reviewDecision','finish');
-          window.location.href = 'step6.html';
+          window.location.href = 'goodbye.html';
         }
       });
     }

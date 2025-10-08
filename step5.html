@@ -144,6 +144,16 @@
     const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
     const reviewDecision = localStorage.getItem('reviewDecision') || 'adjust_cards'; // 'adjust_cards' | 'recompare_sequential'
 
+
+    // Utilidad: validar que 'order' es una permutación 0..n-1
+    function isValidOrder(order, n) {
+      if (!Array.isArray(order) || order.length !== n) return false;
+      const seen = new Set(order);
+      if (seen.size !== n) return false;
+      for (let i = 0; i < n; i++) if (!seen.has(i)) return false;
+      return true;
+    }
+
     // Órdenes:
     // - orderRef: SIEMPRE el ranking calculado (para la tabla de referencia)
     // - orderEff: el ranking efectivo para trabajar en este paso (override si existe, si no el calculado)
@@ -152,7 +162,17 @@
 
     const defaultOrder = Array.from({length:n}, (_,i)=>i);
     const orderRef = Array.isArray(lastComputedOrder) ? lastComputedOrder : defaultOrder;
-    const orderEff = Array.isArray(overrideOrder) ? overrideOrder : orderRef;
+    // Solo usamos overrideOrder si:
+    // - el usuario vino del flujo de reordenar (recompare_sequential)
+    // - y el override es válido para el tamaño actual
+    let orderEff;
+    if (reviewDecision === 'recompare_sequential' && isValidOrder(overrideOrder, n)) {
+      orderEff = overrideOrder;
+    } else {
+      orderEff = orderRef;
+      // (opcional) limpiaremos un override inválido/obsoleto
+      if (!isValidOrder(overrideOrder, n)) localStorage.removeItem('overrideOrder');
+    }
 
     // ===== Reconstrucción y scores (referencia) =====
     function generatePR(L) {
@@ -328,7 +348,6 @@
         for (let i = orderEff.length - 2; i >= 0; i--) {
           const a = orderEff[i], b = orderEff[i + 1];
           const c = cardsToNext.get(`${a}|${b}`) || 0;
-          // Regla: última 0; prev = next + (c==0?0:(c+1)) para que 0 cartas no sume
           accum[a] = (accum[b] + c + 1);
         }
       }
