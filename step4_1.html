@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTM · Step 4.1 (Edit ranking)</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <meta name="theme-color" content="#3498db" />
+
+  <style>
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+    }
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+    }
+    .lead {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+    .rank-table th,
+    .rank-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: left;
+    }
+    .rank-table th {
+      font-weight: 700;
+      font-size: 13px;
+      color: #6b7280;
+    }
+    .rank-num {
+      width: 52px;
+      color: #6b7280;
+    }
+
+    .movie-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+      font-size: 13px;
+      color: #374151;
+      cursor: grab;
+    }
+
+    .draggable {
+      user-select: none;
+    }
+    .dragging {
+      opacity: 0.6;
+    }
+    .hint {
+      font-size: 12px;
+      color: #6b7280;
+      margin-top: 6px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+    .navigate-button {
+      width: 220px;
+      height: 46px;
+    }
+  </style>
+</head>
+<body>
+  <div class="site-logo">
+    <a href="https://sinbad2.ujaen.es/" target="_blank" rel="noopener">
+      <img src="img/logo-sinbad2.png" alt="SINBAD2 Research Group logo" />
+    </a>
+  </div>
+
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
+
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 id="title" data-i18n="step4r_title"></h1>
+      <p class="lead" data-i18n="step4r_hint_drag">
+      </p>
+    </header>
+
+    <section class="panel" aria-labelledby="rankingTitle">
+      <h2 id="rankingTitle" data-i18n="step4r_title"></h2>
+      <table class="rank-table">
+        <thead>
+          <tr>
+            <th class="rank-num" data-i18n="step4r_col_rank"></th>
+            <th data-i18n="step4r_col_movie"></th>
+          </tr>
+        </thead>
+        <tbody id="rankBody"></tbody>
+      </table>
+
+      <div class="actions">
+        <button class="btn navigate-button" id="useBtn" data-i18n="step4_1_continue_recompare">
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    function t(key, data = {}) {
+      if (window.TTM?.t) {
+        const str = window.TTM.t(key) || "";
+        return str.replace(/\{(\w+)\}/g, (_, k) => (data[k] != null ? String(data[k]) : `{${k}}`));
+      }
+      return key;
+    }
+
+    function movieLabel(i) {
+      const tmpl = t("movie_placeholder") || "Object {i}";
+      return tmpl.replace("{i}", String(i + 1));
+    }
+
+    const movies = (localStorage.getItem("movies") || "").split(",").filter(Boolean);
+    const n = movies.length;
+    const last = JSON.parse(localStorage.getItem("lastComputedOrder") || "null");
+    let order = Array.isArray(last)
+      ? last
+      : Array.from({ length: n }, (_, i) => i);
+
+    function renderTable() {
+      const tbody = document.getElementById("rankBody");
+      tbody.innerHTML = "";
+
+      order.forEach((idx, i) => {
+        const tr = document.createElement("tr");
+        tr.dataset.idx = String(idx);
+        tr.className = "draggable";
+        tr.draggable = true;
+
+        const tdRank = document.createElement("td");
+        tdRank.className = "rank-num";
+        tdRank.textContent = String(i + 1);
+
+        const tdMovie = document.createElement("td");
+        const chipEl = document.createElement("span");
+        chipEl.className = "movie-chip";
+        chipEl.textContent = movieLabel(idx);
+        chipEl.title = movies[idx] || "";
+        tdMovie.appendChild(chipEl);
+
+        tr.append(tdRank, tdMovie);
+        tbody.appendChild(tr);
+      });
+
+      makeDraggable(tbody);
+    }
+
+    function makeDraggable(tbody) {
+      let dragEl = null;
+      [...tbody.children].forEach((tr) => {
+        tr.addEventListener("dragstart", (e) => {
+          dragEl = tr;
+          tr.classList.add("dragging");
+          e.dataTransfer.effectAllowed = "move";
+        });
+        tr.addEventListener("dragend", () => {
+          if (dragEl) {
+            dragEl.classList.remove("dragging");
+            dragEl = null;
+          }
+          updateRankNumbers(tbody);
+        });
+        tr.addEventListener("dragover", (e) => {
+          e.preventDefault();
+          const after = getAfter(tbody, e.clientY);
+          const dragging = tbody.querySelector(".dragging");
+          if (!dragging) return;
+          if (after == null) tbody.appendChild(dragging);
+          else tbody.insertBefore(dragging, after);
+        });
+      });
+
+      function getAfter(container, y) {
+        const els = [...container.querySelectorAll("tr:not(.dragging)")];
+        return els.reduce(
+          (closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            return offset < 0 && offset > closest.offset
+              ? { offset, element: child }
+              : closest;
+          },
+          { offset: Number.NEGATIVE_INFINITY }
+        ).element;
+      }
+    }
+
+    function updateRankNumbers(tbody) {
+      [...tbody.children].forEach((tr, i) => {
+        tr.querySelector(".rank-num").textContent = String(i + 1);
+      });
+      order = [...tbody.children].map((tr) => Number(tr.dataset.idx));
+    }
+
+    function init() {
+      if (window.TTM?.refresh) window.TTM.refresh();
+      renderTable();
+
+      document.getElementById("useBtn").addEventListener("click", () => {
+        localStorage.setItem("overrideOrder", JSON.stringify(order));
+        localStorage.setItem("reviewDecision", "recompare_sequential");
+        window.location.href = "step5.html";
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

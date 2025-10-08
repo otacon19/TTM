@@ -46,6 +46,9 @@
       step4r_continue_finish: "Finish",
       step4r_ranking: "Ranking",
 
+      step4r_hint_drag: "Drag to reorder (top = best)",
+      step4_1_continue_recompare: "Use this ranking",
+
       step5_title_table: "Previous ranking",
       step5_title: "Adjust cards",
       step5_right_title: "Adjust cards",
@@ -116,6 +119,9 @@
       step4r_continue_adjust: "Ajustar cartas",
       step4r_continue_finish: "Finalizar",
       step4r_ranking: "Ranking",
+
+      step4r_hint_drag: "Arrastra para reordenar (arriba = mejor)",
+      step4_1_continue_recompare: "Usar este ranking",
       
       step5_title_table: "Ranking previo",
       step5_title: "Ajustar cartas",

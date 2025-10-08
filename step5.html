@@ -85,21 +85,21 @@
       <section class="panel" aria-labelledby="rankingTitle">
         <h2 id="rankingTitle" data-i18n="step5_title_table"></h2>
 
-        <!-- Tabla referencia -->
+        <!-- Tabla referencia (usa SIEMPRE el ranking calculado) -->
         <table class="rank-table" id="rankTable">
           <thead>
             <tr>
               <th class="rank-num" data-i18n="step4r_col_rank"></th>
               <th data-i18n="step4r_col_movie"></th>
               <th data-i18n="step4r_col_scale"></th>
-              <!-- última columna = column (ordenado) -->
+              <!-- última columna = column (ordenado por el ranking calculado) -->
               <th id="accPrevHeader" data-i18n="step5_left_accum_header"></th>
             </tr>
           </thead>
           <tbody id="rankBody"></tbody>
         </table>
 
-        <!-- Tabla EN VIVO -->
+        <!-- Tabla EN VIVO (usa el orden efectivo) -->
         <h2 style="margin-top:16px" id="liveTitle" data-i18n="step5_live_title"></h2>
         <table class="rank-table" id="rankTableLive">
           <thead>
@@ -143,10 +143,16 @@
     const n = movies.length;
     const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
     const reviewDecision = localStorage.getItem('reviewDecision') || 'adjust_cards'; // 'adjust_cards' | 'recompare_sequential'
+
+    // Órdenes:
+    // - orderRef: SIEMPRE el ranking calculado (para la tabla de referencia)
+    // - orderEff: el ranking efectivo para trabajar en este paso (override si existe, si no el calculado)
     const overrideOrder = JSON.parse(localStorage.getItem('overrideOrder') || 'null');
     const lastComputedOrder = JSON.parse(localStorage.getItem('lastComputedOrder') || 'null');
-    const order = Array.isArray(overrideOrder) ? overrideOrder :
-                  (Array.isArray(lastComputedOrder) ? lastComputedOrder : Array.from({length:n}, (_,i)=>i));
+
+    const defaultOrder = Array.from({length:n}, (_,i)=>i);
+    const orderRef = Array.isArray(lastComputedOrder) ? lastComputedOrder : defaultOrder;
+    const orderEff = Array.isArray(overrideOrder) ? overrideOrder : orderRef;
 
     // ===== Reconstrucción y scores (referencia) =====
     function generatePR(L) {
@@ -173,7 +179,7 @@
       return { max, column };
     }
 
-    // ===== Índice de cartas directas (Step 3) — por si necesitas presets
+    // ===== Índice de cartas directas (Step 3)
     function buildUserCardsIndex(L){
       const map = new Map();
       for (let i = 0; i < L.length; i++){
@@ -267,21 +273,21 @@
         input.value = v;
         rowsState[rowIndex].cards = v;
         renderPile(pile, v);
-        updateLiveTable();
+        updateLiveTable(); // refresca tabla en vivo con orderEff
       }
       minus.addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur>0){ input.value = cur-1; onChange(); }});
       plus .addEventListener('click', (e)=>{ e.preventDefault(); const cur = clamp(input.value); if (cur<50){ input.value = cur+1; onChange(); }});
       input.addEventListener('input', onChange);
     }
 
-    // === Tabla 1 (referencia): Value scale = column/max ; última col = column (ordenado)
+    // === Tabla 1 (referencia) — usa orderRef
     function buildLeftTable(column, max){
       const tbody = document.getElementById('rankBody');
       tbody.innerHTML = '';
 
       const maxAbs = Math.max(1, Math.abs(max || 1)); // divisor para normalizar
-      for (let i=0; i<order.length; i++){
-        const idx = order[i];
+      for (let i=0; i<orderRef.length; i++){
+        const idx = orderRef[i];
         const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
 
         const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
@@ -302,7 +308,7 @@
       }
     }
 
-    // === Tabla 2 (en vivo): Value scale = acumulado/maxAcum ; última col = acumulado
+    // === Tabla 2 (en vivo) — usa orderEff
     function updateLiveTable(){
       const tbody = document.getElementById('rankBodyLive');
       tbody.innerHTML = '';
@@ -315,25 +321,23 @@
         cardsToNext.set(`${a}|${b}`, Number(cards)||0);
       }
 
-      // Acumulados desde el final: last = 0; prev += (cards+1)
-      const accum = Array(order.length).fill(0);
-      accum[ order[order.length - 1] ] = 0;
-
-      for (let i = order.length - 2; i >= 0; i--) {
-        const a = order[i], b = order[i + 1];
-        const c = cardsToNext.get(`${a}|${b}`) || 0;
-        if(c != 0)
-          accum[a] = (accum[b] + c) + 1;
-        else
-          accum[a] = accum[b] + c;
+      // Acumulados desde el final con orderEff
+      const accum = Array(n).fill(0);
+      if (orderEff.length > 0) {
+        accum[ orderEff[orderEff.length - 1] ] = 0;
+        for (let i = orderEff.length - 2; i >= 0; i--) {
+          const a = orderEff[i], b = orderEff[i + 1];
+          const c = cardsToNext.get(`${a}|${b}`) || 0;
+          // Regla: última 0; prev = next + (c==0?0:(c+1)) para que 0 cartas no sume
+          accum[a] = (c === 0) ? accum[b] : (accum[b] + c + 1);
+        }
       }
 
-      // Normalización por el máximo acumulado (evita división por 0)
-      const accValues = order.map(idx => accum[idx]);
+      const accValues = orderEff.map(idx => accum[idx]);
       const maxAcc = Math.max(...accValues, 1);
 
-      for (let i=0; i<order.length; i++){
-        const idx = order[i];
+      for (let i=0; i<orderEff.length; i++){
+        const idx = orderEff[i];
         const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
 
         const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
@@ -354,18 +358,19 @@
       }
     }
 
+    // Construye la derecha (mazos) según orderEff
     function buildRightGrid(column, directIdx){
       const grid = document.getElementById('pairsGrid'); grid.innerHTML = '';
-      for (let k=0; k<order.length-1; k++){
-        const a = order[k], b = order[k+1];
+      for (let k=0; k<orderEff.length-1; k++){
+        const a = orderEff[k], b = orderEff[k+1];
         let initialCards = 0;
 
         if (reviewDecision === 'adjust_cards') {
-          // Si hubo comparación directa, usar esas cartas; si no, usar diff(column)
+          // Si hubo comparación directa, usar esas cartas; si no, usar diff(column) - 1
           const key1 = `${a}|${b}`, key2 = `${b}|${a}`;
           if (directIdx.has(key1))      initialCards = directIdx.get(key1).cards;
           else if (directIdx.has(key2)) initialCards = directIdx.get(key2).cards;
-          else                          initialCards = Math.max(0, column[a]-column[b]) - 1;
+          else                          initialCards = Math.max(0, Math.round(column[a] - column[b]) - 1);
         } else {
           // Recompare secuencial: empiezan en 0
           initialCards = 0;
@@ -378,7 +383,7 @@
     function onSave(){
       localStorage.setItem('step5Cards', JSON.stringify(rowsState));
       localStorage.setItem('step5Mode', reviewDecision); // 'adjust_cards' | 'recompare_sequential'
-      // Mantengo tu navegación actual
+      // Mantengo tu navegación actual (ajústalo si debe ir a step6.html)
       window.location.href = 'goodbye.html';
     }
 
@@ -395,13 +400,11 @@
       const max = scores.max;
       const directIdx = buildUserCardsIndex(L);
 
-      // Tabla 1
+      // Tabla 1 (SIEMPRE orderRef)
       buildLeftTable(column, max);
-      
-      // Cartas
-      buildRightGrid(column, directIdx);
 
-      // Tabla 2 (en vivo)
+      // Cartas y tabla viva (orderEff)
+      buildRightGrid(column, directIdx);
       updateLiveTable();
 
       document.getElementById('saveBtn').addEventListener('click', onSave);
