@@ -21,13 +21,13 @@
     .rank-table th, .rank-table td { padding: 8px 6px; border-bottom: 1px solid #f1f5f9; text-align: left; }
     .rank-table th { font-weight: 700; font-size: 13px; color: #6b7280; }
     .rank-num { width: 52px; color: #6b7280; }
+
     .movie-chip {
       display: inline-flex; align-items: center; gap: 6px;
       padding: 3px 9px; border: 1px solid #e5e7eb; border-radius: 999px;
       background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.06);
       font-size: 13px; color: #374151; cursor: help;
     }
-    .small-note { font-size: 12px; color: #6b7280; margin-top: 6px; }
 
     .pairs-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .pair-row { display: grid; grid-template-rows: auto auto auto; gap: 8px; justify-items: center; align-items: start; }
@@ -89,30 +89,30 @@
         <table class="rank-table" id="rankTable">
           <thead>
             <tr>
-              <th class="rank-num" data-i18n="step4r_col_rank">Rank</th>
-              <th data-i18n="step4r_col_movie">Movie</th>
-              <th data-i18n="step4r_col_scale">Value scale</th>
-              <th id="cardsPrevHeader" data-i18n="step5_left_prev_cards_header">Previous cards</th>
+              <th class="rank-num" data-i18n="step4r_col_rank"></th>
+              <th data-i18n="step4r_col_movie"></th>
+              <th data-i18n="step4r_col_scale"></th>
+              <!-- última columna = column (ordenado) -->
+              <th id="accPrevHeader" data-i18n="step5_left_accum_header"></th>
             </tr>
           </thead>
           <tbody id="rankBody"></tbody>
         </table>
-        <div class="small-note" id="cardsPrevNote" data-i18n="step5_left_prev_cards_note"></div>
 
         <!-- Tabla EN VIVO -->
-        <h2 style="margin-top:16px" id="liveTitle" data-i18n="step5_live_title">Live ranking</h2>
+        <h2 style="margin-top:16px" id="liveTitle" data-i18n="step5_live_title"></h2>
         <table class="rank-table" id="rankTableLive">
           <thead>
             <tr>
               <th class="rank-num" data-i18n="step4r_col_rank">Rank</th>
               <th data-i18n="step4r_col_movie">Movie</th>
               <th data-i18n="step4r_col_scale">Value scale</th>
-              <th id="cardsCurrHeader" data-i18n="step5_left_curr_cards_header">Current cards</th>
+              <!-- última columna = acumulado (vivo) -->
+              <th id="accCurrHeader" data-i18n="step5_left_accum_header"></th>
             </tr>
           </thead>
           <tbody id="rankBodyLive"></tbody>
         </table>
-        <div class="small-note" id="cardsCurrNote" data-i18n="step5_left_curr_cards_note"></div>
       </section>
 
       <!-- DERECHA: mazos -->
@@ -129,16 +129,15 @@
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script>
- 
-     // ===== i18n helper mínimo (solo delega en TTM) =====
-     function t(key, data = {}) {
+    // ===== i18n helper =====
+    function t(key, data = {}) {
       if (window.TTM?.t) {
         const str = window.TTM.t(key) || '';
         return str.replace(/\{(\w+)\}/g, (_, k) => (data[k] != null ? String(data[k]) : '{' + k + '}'));
       }
       return key;
     }
-    
+
     // ===== Datos base =====
     const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
     const n = movies.length;
@@ -174,7 +173,7 @@
       return { max, column };
     }
 
-    // ===== Índice de cartas directas (Step 3)
+    // ===== Índice de cartas directas (Step 3) — por si necesitas presets
     function buildUserCardsIndex(L){
       const map = new Map();
       for (let i = 0; i < L.length; i++){
@@ -275,35 +274,82 @@
       input.addEventListener('input', onChange);
     }
 
-    function buildLeftTable(column, max, directIdx){
+    // === Tabla 1 (referencia): Value scale = column/max ; última col = column (ordenado)
+    function buildLeftTable(column, max){
       const tbody = document.getElementById('rankBody');
       tbody.innerHTML = '';
-      const utilities = column.map(v => v / Math.max(1, Math.abs(max || 1)));
+
+      const maxAbs = Math.max(1, Math.abs(max || 1)); // divisor para normalizar
+      for (let i=0; i<order.length; i++){
+        const idx = order[i];
+        const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
+
+        const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
+
+        const tdMovie= document.createElement('td');
+        const chipEl = document.createElement('span'); chipEl.className='movie-chip';
+        chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
+        tdMovie.appendChild(chipEl);
+
+        const tdScale = document.createElement('td');
+        tdScale.textContent = (column[idx] / maxAbs).toFixed(3);
+
+        const tdAccum = document.createElement('td');
+        tdAccum.textContent = String(Math.round(column[idx]));
+
+        tr.append(tdRank, tdMovie, tdScale, tdAccum);
+        tbody.appendChild(tr);
+      }
+    }
+
+    // === Tabla 2 (en vivo): Value scale = acumulado/maxAcum ; última col = acumulado
+    function updateLiveTable(){
+      const tbody = document.getElementById('rankBodyLive');
+      tbody.innerHTML = '';
+
+      // Mapa cartas (a|b) -> número de cartas
+      const cardsToNext = new Map();
+      for (let k=0; k<rowsState.length; k++){
+        const {a,b,cards} = rowsState[k] || {};
+        if (a==null || b==null) continue;
+        cardsToNext.set(`${a}|${b}`, Number(cards)||0);
+      }
+
+      // Acumulados desde el final: last = 0; prev += (cards+1)
+      const accum = Array(order.length).fill(0);
+      accum[ order[order.length - 1] ] = 0;
+
+      for (let i = order.length - 2; i >= 0; i--) {
+        const a = order[i], b = order[i + 1];
+        const c = cardsToNext.get(`${a}|${b}`) || 0;
+        if(c != 0)
+          accum[a] = (accum[b] + c) + 1;
+        else
+          accum[a] = accum[b] + c;
+      }
+
+      // Normalización por el máximo acumulado (evita división por 0)
+      const accValues = order.map(idx => accum[idx]);
+      const maxAcc = Math.max(...accValues, 1);
 
       for (let i=0; i<order.length; i++){
         const idx = order[i];
         const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
 
         const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
+
         const tdMovie= document.createElement('td');
-        const chipEl = document.createElement('span'); chipEl.className='movie-chip'; chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
+        const chipEl = document.createElement('span'); chipEl.className='movie-chip';
+        chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
         tdMovie.appendChild(chipEl);
 
-        const tdUtil = document.createElement('td'); tdUtil.textContent = utilities[idx].toFixed(3);
+        const tdScale = document.createElement('td');
+        tdScale.textContent = (accum[idx] / maxAcc).toFixed(3);
 
-        const tdCards = document.createElement('td');
-        if (i < order.length - 1) {
-          const a = order[i], b = order[i+1];
-          const key1 = `${a}|${b}`, key2 = `${b}|${a}`;
-          let cardsPrev = 0;
-          if (directIdx.has(key1))      cardsPrev = directIdx.get(key1).cards;
-          else if (directIdx.has(key2)) cardsPrev = directIdx.get(key2).cards;
-          else                          cardsPrev = Math.max(0, Math.round(column[a]-column[b]));
-          tdCards.textContent = String(cardsPrev);
-        } else {
-          tdCards.textContent = '—';
-        }
-        tr.append(tdRank, tdMovie, tdUtil, tdCards);
+        const tdAccum = document.createElement('td');
+        tdAccum.textContent = String(accum[idx]);
+
+        tr.append(tdRank, tdMovie, tdScale, tdAccum);
         tbody.appendChild(tr);
       }
     }
@@ -313,93 +359,49 @@
       for (let k=0; k<order.length-1; k++){
         const a = order[k], b = order[k+1];
         let initialCards = 0;
+
         if (reviewDecision === 'adjust_cards') {
+          // Si hubo comparación directa, usar esas cartas; si no, usar diff(column)
           const key1 = `${a}|${b}`, key2 = `${b}|${a}`;
           if (directIdx.has(key1))      initialCards = directIdx.get(key1).cards;
           else if (directIdx.has(key2)) initialCards = directIdx.get(key2).cards;
-          else                          initialCards = Math.max(0, Math.round(column[a]-column[b]));
+          else                          initialCards = Math.max(0, column[a]-column[b]) - 1;
         } else {
+          // Recompare secuencial: empiezan en 0
           initialCards = 0;
         }
+
         buildRow(k, a, b, initialCards);
-      }
-    }
-
-    // ===== LIVE TABLE (en caliente)
-    function updateLiveTable(){
-      const tbody = document.getElementById('rankBodyLive');
-      tbody.innerHTML = '';
-
-      const cardsToNext = new Map();
-      let total = 0;
-      for (let k=0; k<rowsState.length; k++){
-        const {a,b,cards} = rowsState[k] || {};
-        if (a==null || b==null) continue;
-        const c = Number(cards) || 0;
-        cardsToNext.set(`${a}|${b}`, c);
-        total += c;
-      }
-
-      const U = Array(n).fill(0);
-      const top = order[0];
-      const base = total + 1;
-      U[top] = base;
-      for (let i=1; i<order.length; i++){
-        const a = order[i-1], b = order[i];
-        const c = cardsToNext.get(`${a}|${b}`) || 0;
-        U[b] = U[a] - c;
-      }
-
-      const showDash = (total === 0);
-      for (let i=0; i<order.length; i++){
-        const idx = order[i];
-        const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
-
-        const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
-
-        const tdMovie= document.createElement('td');
-        const chipEl = document.createElement('span'); chipEl.className='movie-chip'; chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
-        tdMovie.appendChild(chipEl);
-
-        const tdScale = document.createElement('td');
-        tdScale.textContent = showDash ? '–' : (U[idx] / base).toFixed(3);
-
-        const tdCards = document.createElement('td');
-        if (i < order.length - 1) {
-          const a = order[i], b = order[i+1];
-          const c = cardsToNext.get(`${a}|${b}`) || 0;
-          tdCards.textContent = String(c);
-        } else {
-          tdCards.textContent = '—';
-        }
-        tr.append(tdRank, tdMovie, tdScale, tdCards);
-        tbody.appendChild(tr);
       }
     }
 
     function onSave(){
       localStorage.setItem('step5Cards', JSON.stringify(rowsState));
       localStorage.setItem('step5Mode', reviewDecision); // 'adjust_cards' | 'recompare_sequential'
+      // Mantengo tu navegación actual
       window.location.href = 'goodbye.html';
     }
 
     function init(){
-      // Intro según flujo elegido, luego refresco i18n
-      const intro = (reviewDecision === 'recompare_sequential') ? 'step5_intro_recompare' : 'step5_intro_adjust';
-      document.getElementById('introText').setAttribute('data-i18n', intro);
-
+      // Intro según flujo elegido
+      document.getElementById('introText').setAttribute('data-i18n',
+        (reviewDecision === 'recompare_sequential') ? 'step5_intro_recompare' : 'step5_intro_adjust'
+      );
       if (window.TTM?.refresh) window.TTM.refresh();
 
-      // Referencia
       const A = generatePR(L);
       const scores = calculateScores(A);
       const column = scores.column.slice();
       const max = scores.max;
       const directIdx = buildUserCardsIndex(L);
 
-      buildLeftTable(column, max, directIdx);
+      // Tabla 1
+      buildLeftTable(column, max);
+      
+      // Cartas
       buildRightGrid(column, directIdx);
 
+      // Tabla 2 (en vivo)
       updateLiveTable();
 
       document.getElementById('saveBtn').addEventListener('click', onSave);

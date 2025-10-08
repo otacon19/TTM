@@ -66,6 +66,9 @@
         }
       }));
       const column = matrix.map(row => row[colIndex]);
+      console.log("===========================");
+      console.log(column);
+      console.log("===========================");
       return { max, column };
     }
   
@@ -152,7 +155,11 @@
     // ==== Inicialización ====
     function init() {
       if (window.TTM?.refresh) window.TTM.refresh();
-  
+      
+      console.log("UNIDADES");
+      console.log(L);
+      console.log("================")
+
       const A = generatePR(L);
       const { max, column } = calculateScores(A);
       const maxVal = Math.max(1, Math.abs(max || 1));

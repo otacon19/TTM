@@ -57,10 +57,11 @@
       step5_left_curr_cards_note:
         "This table updates automatically as you adjust the cards on the right. If all decks are 0, you will see “–” in the value scale.",
       step5_intro_adjust:
-        "Adjust the preference cards. We prefilled values from previous steps; feel free to tweak them.",
+        "Adjust the preference cards. We prefilled values from previous steps; feel free to change them.",
       step5_intro_recompare:
         "Review and adjust preference gaps between adjacent pairs in your ranking (we start from 0).",
       step5_continue: "Finish",
+      step5_left_accum_header: "Units",
 
       goodbye_title: "Thank you for participating!",
       goodbye_text:
@@ -131,6 +132,7 @@
       step5_intro_recompare:
         "Revisa y ajusta las diferencias de preferencia entre pares adyacentes en tu clasificación (empezamos desde 0).",
       step5_continue: "Finalizar",
+      step5_left_accum_header: "Unidades",
       
       goodbye_title: "¡Gracias por participar!",
       goodbye_text:
