@@ -23,7 +23,7 @@
       for (let i=0;i<Math.min(L.length, n); i++) {
         const r1 = Math.floor(L[i][0]);
         const r2 = Math.floor(L[i][1]);
-        const value = L[i][2] || 0;
+        const value = L[i][2] || 1;
         A[r1][r2] = value; A[r2][r1] = -value;
         N[r1][r2]=N[r2][r1]=1;
       }

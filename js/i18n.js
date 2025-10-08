@@ -40,7 +40,7 @@
       step4r_continue: "Continue",
       step4r_cards_panel_title: "Deck of cards",
       step4r_logic_note_recompare:
-        "Because you're not satisfied with the ranking, next we will compare adjacent pairs from your current ranking: Top 1 vs Top 2, Top 2 vs Top 3, and so on.",
+        "Since you disagree with the ranking, in the next step we will ask you to define the ranking that you consider correct according to your preferences.",
       step4r_logic_note_cards_disabled:
         "The card question is disabled when the ranking will be recomputed from adjacent comparisons.",
       step4r_continue_recompare: "Re-compare",
@@ -112,7 +112,7 @@
       step4r_continue: "Continuar",
       step4r_cards_panel_title: "Baraja de cartas",
       step4r_logic_note_recompare:
-        "Como no estás satisfecho con el ranking, en el siguiente paso compararemos pares adyacentes de tu ranking actual: Top 1 vs Top 2, Top 2 vs Top 3, y así sucesivamente.",
+        "Dado que no está de acuerdo con el ranking, en el siguiente paso le pediremos que defina el ranking que considere correcto según sus preferencias",
       step4r_logic_note_cards_disabled:
         "La pregunta sobre cartas se desactiva cuando el ranking se va a recalcular a partir de comparaciones adyacentes.",
       step4r_continue_recompare: "Volver a comparar",

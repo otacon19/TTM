@@ -169,9 +169,9 @@
     function updateMatricesForPair(aIndex, bIndex, prefSide, count) {
       const a = winList[aIndex], b = winList[bIndex];
   
-      // Empate (0 cartas o sin elegir): intensidad 0 y pasa 'a' arbitrariamente
+      // Empate (0 cartas o sin elegir): unidades 1 y pasa 'a' arbitrariamente
       if (!prefSide || count === 0) {
-        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = 0;
+        L[Lindex][0] = a; L[Lindex][1] = b; L[Lindex][2] = count + 1;
         newWinList.push(a);
         Lindex++; return;
       }

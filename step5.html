@@ -266,6 +266,15 @@
     // ===== Estado editable
     const rowsState = []; // [{a,b,cards}]
 
+    // Modo "mostrar valores" en la tabla viva.
+    // - adjust_cards: desde el inicio true (tenemos cartas de referencia)
+    // - recompare_sequential: empieza false y pasa a true si el usuario añade alguna carta
+    let liveTableShowValues = (reviewDecision === 'adjust_cards');
+
+    function anyCardsSet() {
+      return rowsState.some(r => (r && (Number(r.cards) || 0) > 0));
+    }
+
     function buildRow(rowIndex, a, b, initialCards){
       const grid = document.getElementById('pairsGrid');
       const row  = document.createElement('div'); row.className = 'pair-row';
@@ -289,6 +298,11 @@
 
       function clamp(v){ v = parseInt(v||'0',10); if (isNaN(v)) v=0; return Math.max(0, Math.min(50, v)); }
       function onChange(){
+
+        if (!liveTableShowValues && reviewDecision === 'recompare_sequential') {
+          if (anyCardsSet()) liveTableShowValues = true;
+        }
+
         const v = clamp(input.value);
         input.value = v;
         rowsState[rowIndex].cards = v;
@@ -333,12 +347,37 @@
       const tbody = document.getElementById('rankBodyLive');
       tbody.innerHTML = '';
 
+      // ¿Debemos mostrar valores numéricos?
+      // - En adjust_cards: siempre true
+      // - En recompare_sequential: solo cuando el usuario haya añadido alguna carta (>0)
+      const showValues = (reviewDecision === 'adjust_cards') || liveTableShowValues;
+
       // Mapa cartas (a|b) -> número de cartas
       const cardsToNext = new Map();
       for (let k=0; k<rowsState.length; k++){
         const {a,b,cards} = rowsState[k] || {};
         if (a==null || b==null) continue;
         cardsToNext.set(`${a}|${b}`, Number(cards)||0);
+      }
+
+       // Si no hay que mostrar valores (recompare + sin cambios): filas con “-”
+      if (!showValues) {
+        for (let i=0; i<orderEff.length; i++){
+          const idx = orderEff[i];
+          const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
+
+          const tdRank = document.createElement('td'); tdRank.className='rank-num'; tdRank.textContent = String(i+1);
+          const tdMovie= document.createElement('td');
+          const chipEl = document.createElement('span'); chipEl.className='movie-chip';
+          chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || ''; tdMovie.appendChild(chipEl);
+
+          const tdScale = document.createElement('td'); tdScale.textContent = '-';
+          const tdAccum = document.createElement('td'); tdAccum.textContent = '-';
+
+          tr.append(tdRank, tdMovie, tdScale, tdAccum);
+          tbody.appendChild(tr);
+        }
+        return;
       }
 
       // Acumulados desde el final con orderEff
