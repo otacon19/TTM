@@ -77,7 +77,7 @@
   <main class="card" role="main">
     <header class="page-header">
       <h1 id="title" data-i18n="step5_title">Step 5</h1>
-      <p class="lead" id="introText" data-i18n="step5_intro_adjust"></p>
+      <p class="lead" id="introText" data-i18n="step5_intro"></p>
     </header>
 
     <div class="layout">
@@ -389,9 +389,7 @@
 
     function init(){
       // Intro según flujo elegido
-      document.getElementById('introText').setAttribute('data-i18n',
-        (reviewDecision === 'recompare_sequential') ? 'step5_intro_recompare' : 'step5_intro_adjust'
-      );
+      document.getElementById('introText').setAttribute('data-i18n','step5_intro');
       if (window.TTM?.refresh) window.TTM.refresh();
 
       const A = generatePR(L);
