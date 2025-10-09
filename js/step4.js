@@ -92,10 +92,10 @@
       // El botón depende de P1 (como siempre). Aquí NO cambiamos la ruta.
       if (rankNo) {
         noteRecompare.style.display = 'block';
-        continueBtn.textContent = i18n.t('step4r_continue_recompare');
-        continueBtn.setAttribute('data-next', 'recompare');
+        continueBtn.textContent = t('step4r_continue_recompare');
+        continueBtn.setAttribute('data-next', 'edit_ranking');
       } else {
-        continueBtn.textContent = i18n.t('step4r_continue_finish');
+        continueBtn.textContent = t('step4r_continue_finish');
         continueBtn.setAttribute('data-next', 'finish');
       }
       return; // importante: no continuar con la lógica "normal"
