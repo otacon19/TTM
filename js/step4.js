@@ -10,6 +10,19 @@
       }
       return key;
     }
+
+    function hasTiesInUtilities(utils, tol = 1e-6) {
+      // utils es un array de números ya normalizados (value scale)
+      // true si existen dos valores (de índices distintos) iguales dentro de la tolerancia
+      const seen = new Map();
+      for (let i = 0; i < utils.length; i++) {
+        const key = Math.round(utils[i] / tol); // discretizamos por tolerancia
+        if (seen.has(key)) return true;
+        seen.set(key, true);
+      }
+      return false;
+    }    
+
     function movieLabel(i){ const tmpl = t('movie_placeholder') || 'Object {i}'; return tmpl.replace('{i}', String(i+1)); }
 
     const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
@@ -66,6 +79,28 @@
     const noteCardsDisabled = document.getElementById('noteCardsDisabled');
     const continueBtn = document.getElementById('continueBtn');
 
+    const tieExists = !!window.__STEP4_TIE_EXISTS__;
+
+    if (tieExists) {
+      // Caso EMPATE: solo habilitamos P1, deshabilitamos P2 y mostramos nota de empate
+      cardsFieldset.classList.add('disabled-question');
+      cardsFieldset.disabled = true;
+      noteCardsTie.style.display = 'block';
+      noteCardsDisabled.style.display = 'none'; // esta nota es para el flujo "rankNo"
+      noteRecompare.style.display = 'none';     // se mostrará si eligen "No" en P1 (más abajo)
+  
+      // El botón depende de P1 (como siempre). Aquí NO cambiamos la ruta.
+      if (rankNo) {
+        noteRecompare.style.display = 'block';
+        continueBtn.textContent = i18n.t('step4r_continue_recompare');
+        continueBtn.setAttribute('data-next', 'recompare');
+      } else {
+        continueBtn.textContent = i18n.t('step4r_continue_finish');
+        continueBtn.setAttribute('data-next', 'finish');
+      }
+      return; // importante: no continuar con la lógica "normal"
+    }
+
     if (rankNo) {
       // si no está de acuerdo con ranking, ignoramos cartas aquí
       cardsFieldset.classList.add('disabled-question');
@@ -119,6 +154,11 @@
         tr.append(tdRank, tdMovie, tdScale, tdUnits);
         tbody.appendChild(tr);
       }
+
+      // ... tras calcular column, max y utilities y pintar la tabla:
+      const tieExists = hasTiesInUtilities(column);
+      window.__STEP4_TIE_EXISTS__ = tieExists; // lo usamos en updateQuestionsUI
+
 
        // Preguntas iniciales
         document.querySelector('input[name="rankOk"][value="yes"]').checked = true;

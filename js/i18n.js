@@ -10,7 +10,7 @@
       index_next_button: "Next",
       
       step1_title: "Number of objects to compare",
-      step1_description: "Introduce the number of objects to compare. Select between 4 and 6.",
+      step1_description: "Introduce the number of objects to compare. Select between 3 and 6.",
 
       step2_title: "Name of objects",
       step2_description: "Introduce the name of the objects.",
@@ -39,11 +39,15 @@
       step4r_no: "No",
       step4r_continue: "Continue",
       step4r_cards_panel_title: "Deck of cards",
+     
       step4r_logic_note_recompare:
         "Since you disagree with the ranking, in the next step we will ask you to define the ranking that you consider correct according to your preferences.",
       step4r_logic_note_cards_disabled:
         "The card question is disabled when the ranking will be recomputed from adjacent comparisons.",
-      step4r_continue_recompare: "Re-compare",
+        step4r_logic_note_tie:
+        "We detected a tie in the value scale. The cards question is disabled. Please break the tie by reviewing the ranking first.",
+      
+        step4r_continue_recompare: "Re-compare",
       step4r_continue_adjust: "Adjust cards",
       step4r_continue_finish: "Finish",
       step4r_ranking: "Ranking",
@@ -79,7 +83,7 @@
 
       step1_title: "Número de objetos a comparar",
       step1_description:
-        "Introduce el número de objetos a comparar. Puedes escoger entre 4 y 6.",
+        "Introduce el número de objetos a comparar. Puedes escoger entre 3 y 6.",
 
       step2_title: "Nombre de objetos",
       step2_description: "Introduce el nombre de los objetos.",
@@ -111,10 +115,14 @@
       step4r_no: "No",
       step4r_continue: "Continuar",
       step4r_cards_panel_title: "Baraja de cartas",
+
       step4r_logic_note_recompare:
         "Dado que no está de acuerdo con el ranking, en el siguiente paso le pediremos que defina el ranking que considere correcto según sus preferencias",
       step4r_logic_note_cards_disabled:
         "La pregunta sobre cartas se desactiva cuando el ranking se va a recalcular a partir de comparaciones adyacentes.",
+        step4r_logic_note_tie:
+        "Se ha detectado un empate en la escala de valores. La pregunta sobre cartas queda desactivada. Por favor, rompe el empate revisando el ranking primero.",
+
       step4r_continue_recompare: "Volver a comparar",
       step4r_continue_adjust: "Ajustar cartas",
       step4r_continue_finish: "Finalizar",

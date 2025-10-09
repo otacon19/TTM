@@ -26,6 +26,15 @@
     let newWinList = [];
   
     const rowsState = {}; // {pref: 'left'|'right'|null, count: number}
+
+    // ¿Todas las filas tienen preferencia elegida?
+    function allRowsHavePreference(totalRows) {
+      for (let i = 0; i < totalRows; i++) {
+        const st = rowsState[i];
+        if (!st || (st.pref !== 'left' && st.pref !== 'right')) return false;
+      }
+      return true;
+    }
   
     function labelForIndex(idx) {
       const tmpl = (window.TTM?.t('movie_placeholder')) || 'Object {i}';
@@ -132,23 +141,14 @@
         input.disabled = !enabled;
         plus.disabled  = !enabled;
       }
-  
-      function updateProgress() {
-        const roundButton = document.getElementById('roundButton');
-        const nextButton  = document.getElementById('nextButton');
-        const lastRound   = (round + 1 === comp.length);
-        // Empate (sin elegir y 0 cartas) es válido; la navegación depende de si es la última ronda.
-        roundButton.disabled = lastRound;
-        nextButton.disabled  = !lastRound;
-      }
-  
+      
       function onPrefChange(side) {
         rowsState[rowIndex].pref = side;
         rowsState[rowIndex].count = 0;
         input.value = '0';
         renderPile(pile, 0);
         setControlsEnabled(!!side);
-        updateProgress();
+        updateButtons();
       }
   
       function onCountChange() {
@@ -156,7 +156,7 @@
         input.value = c;
         rowsState[rowIndex].count = c;
         renderPile(pile, c);
-        updateProgress();
+        updateButtons();
       }
   
       leftRadio.addEventListener('change', () => { if (leftRadio.checked)  onPrefChange('left');  });
@@ -204,14 +204,23 @@
       round++;
       if (window.TTM?.refresh) window.TTM.refresh();
   
-      // Actualiza botones con el nuevo estado
-      const roundButton = document.getElementById('roundButton');
-      const nextButton  = document.getElementById('nextButton');
-      const lastRound   = (round + 1 === comp.length);
-      roundButton.disabled = lastRound;
-      nextButton.disabled  = !lastRound;
+      updateButtons();
     }
   
+    function updateButtons() {
+      const roundButton = document.getElementById('roundButton');
+      const nextButton  = document.getElementById('nextButton');
+    
+      // nº de filas activas en esta ronda
+      const totalRows = Math.floor(winList.length / 2);
+      const selectedAll = allRowsHavePreference(totalRows);
+      const lastRound   = (round + 1 === comp.length);
+    
+      // Solo permitir avanzar si TODAS las filas tienen preferencia
+      roundButton.disabled = !selectedAll || lastRound === true;
+      nextButton.disabled  = !(selectedAll && lastRound === true);
+    }
+
     function goToNextStep() {
       // si quedaban rondas pendientes, las completamos
       if (round < comp.length) runRound();
@@ -241,8 +250,8 @@
       // estado inicial de botones
       const roundButton = document.getElementById('roundButton');
       const nextButton  = document.getElementById('nextButton');
-      roundButton.disabled = (round + 1 === comp.length);
-      nextButton.disabled  = !(round + 1 === comp.length);
+      roundButton.disabled = true;
+      nextButton.disabled  = true;
   
       wireButtons();
       if (window.TTM?.refresh) window.TTM.refresh();
