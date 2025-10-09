@@ -7,20 +7,19 @@
     if (btnEs) btnEs.addEventListener("click", () => TTM.setLanguage("es"));
   }
 
-  function bindLandingFormIfPresent() {
-    const form = document.getElementById("form");
-    form.addEventListener("submit", (ev) => {
-      ev.preventDefault();
-      window.location.href = "step1.html";
-    });
-  }
 
   function init() {
     // Aplica traducción a todo el DOM con el idioma actual
     TTM.refresh();
     // Enlaza UX común (no-i18n)
     bindLanguageButtons();
-    bindLandingFormIfPresent();
+    
+    const form = document.getElementById("form");
+    form.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      const nextUrl = form.getAttribute('data-next') || 'step1.html';
+      window.location.href = `${nextUrl}`;
+    });
   }
 
   document.addEventListener("DOMContentLoaded", init);

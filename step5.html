@@ -361,7 +361,7 @@
       }
 
        // Si no hay que mostrar valores (recompare + sin cambios): filas con “-”
-      if (!showValues) {
+      /*if (!showValues) {
         for (let i=0; i<orderEff.length; i++){
           const idx = orderEff[i];
           const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
@@ -378,7 +378,7 @@
           tbody.appendChild(tr);
         }
         return;
-      }
+      }*/
 
       // Acumulados desde el final con orderEff
       const accum = Array(n).fill(0);

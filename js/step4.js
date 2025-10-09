@@ -30,6 +30,7 @@
     const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
 
     function generatePR(L) {
+      console.log(L);
       const A = Array.from({length:n}, ()=>Array(n).fill(0));
       const N = Array.from({length:n}, ()=>Array(n).fill(0));
       for (let i=0;i<n;i++){ A[i][i]=0; N[i][i]=1; }
@@ -63,6 +64,7 @@
     }
 
     function calculateScores(matrix) {
+      console.log(matrix);
       let max = -Infinity, colIndex = -1;
       matrix.forEach(row => row.forEach((val,j)=>{
         if(val>max){ max=val; colIndex=j; }
