@@ -2,9 +2,9 @@
 (() => {
   const I18N = {
     en: {
-      index_title: "Tournament Tree Model",
+      index_title: "Tournament Tree Method",
       index_description:
-        "The purpose of this tool is for users to test a new preference collection methodology called the Tournament Tree Model. To do this, you will be asked to list a series of objects, at your discretion, and compare them with each other.",
+        "The purpose of this tool is for users to test a new preference collection methodology called the Tournament Tree Method. To do this, you will be asked to list a series of objects, at your discretion, and compare them with each other.",
       index_name_label: "Your name",
       index_name_placeholder: "Enter your name",
       index_next_button: "Next",
@@ -75,9 +75,9 @@
     
     },
     es: {
-      index_title: "Tournament Tree Model",
+      index_title: "Tournament Tree Method",
       index_description:
-        "El propósito de esta herramienta es que los usuarios testeen una nueva metodología de recolección de preferencias denominada Tournament Tree Model. Para ello, se le pedirá que liste una serie de objetos, a su criterio, y que los compare entre sí.",
+        "El propósito de esta herramienta es que los usuarios testeen una nueva metodología de recolección de preferencias denominada Tournament Tree Method. Para ello, se le pedirá que liste una serie de objetos, a su criterio, y que los compare entre sí.",
       index_name_label: "Tu nombre",
       index_name_placeholder: "Introduce tu nombre",
       index_next_button: "Siguiente",
