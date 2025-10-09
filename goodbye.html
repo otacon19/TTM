@@ -33,7 +33,29 @@
     <header class="page-header">
       <h1 id="goodbye_title" data-i18n="goodbye_title"></h1>
     </header>
+    <div style="margin-top:16px">
+      <button id="restartBtn" class="btn navigate-button" data-i18n="goodbye_restart">
+      </button>
+    </div>
   </main>
+
+  <script>
+    // Mantener el idioma, limpiar el resto y volver a step1
+    document.addEventListener('DOMContentLoaded', () => {
+      const btn = document.getElementById('restartBtn');
+      btn?.addEventListener('click', () => {
+        const lang = localStorage.getItem('language'); // conservar idioma elegido
+        // Borra TODO para evitar conflictos entre sesiones anteriores
+        localStorage.clear();
+        sessionStorage.clear();
+        // (opcional) conservar idioma
+        if (lang) localStorage.setItem('language', lang);
+  
+        // Ir al primer paso
+        window.location.href = 'step1.html';
+      });
+    });
+  </script>
 
   <!-- Lógica común (incluye i18n y listeners de idioma) -->
   <script src="js/i18n.js"></script>

@@ -1,13 +1,5 @@
 /* js/app.js — UX común (lenguaje y formularios), SIN i18n interno */
 (() => {
-  function validatePresence(inputEl, buttonEl) {
-    if (!inputEl || !buttonEl) return true;
-    const empty = !inputEl.value.trim();
-    inputEl.classList.toggle("invalid", empty);
-    buttonEl.disabled = empty;
-    return !empty;
-  }
-
   function bindLanguageButtons() {
     const btnEn = document.getElementById("btn-en");
     const btnEs = document.getElementById("btn-es");
@@ -17,22 +9,10 @@
 
   function bindLandingFormIfPresent() {
     const form = document.getElementById("form");
-    const nameBox = document.getElementById("name_box");
-    const nextBtn = document.getElementById("nextButton");
-    if (!form) return;
-
-    const onInput = () => validatePresence(nameBox, nextBtn);
-    nameBox && nameBox.addEventListener("input", onInput);
-
     form.addEventListener("submit", (ev) => {
       ev.preventDefault();
-      if (!validatePresence(nameBox, nextBtn)) return;
-      if (nameBox) localStorage.setItem("user_name", nameBox.value.trim());
-      const nextUrl = form.getAttribute("data-next") || "step1.html";
-      window.location.href = nextUrl;
+      window.location.href = "step1.html";
     });
-
-    onInput();
   }
 
   function init() {

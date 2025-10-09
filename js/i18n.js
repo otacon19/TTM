@@ -71,6 +71,7 @@
       step5_left_accum_header: "Units",
 
       goodbye_title: "Thank you for using the tool!",
+      goodbye_restart: "Start over",
     
     },
     es: {
@@ -146,7 +147,8 @@
       step5_continue: "Finalizar",
       step5_left_accum_header: "Unidades",
       
-      goodbye_title: "¡Gracias por usar la herramienta!", 
+      goodbye_title: "¡Gracias por usar la herramienta!",
+      goodbye_restart: "Volver a empezar", 
     },
   };
 
