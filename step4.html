@@ -91,6 +91,16 @@
 
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
-  <script src="js/step4.js"></script>
+  <script type="module">
+
+  import { saveCurrentParticipantResult }
+    from './js/results.js';
+
+  window.saveCurrentParticipantResult =
+    saveCurrentParticipantResult;
+
+  </script>
+
+<script src="js/step4.js"></script>
 </body>
 </html>

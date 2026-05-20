@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTM - Join problem</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <div class="site-logo">
+    <a href="" target="_blank" rel="noopener">
+      <img src="img/logo.png" alt="Tournament Tree Method" />
+    </a>
+  </div>
+
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
+
+  <main class="card" role="main">
+
+    <header class="page-header">
+      <h1 data-i18n="join_title"></h1>
+    </header>
+
+    <p data-i18n="join_description"></p>
+
+    <form class="form" id="joinProblemForm" novalidate>
+
+      <div class="field">
+        <label for="problemCode" data-i18n="join_code_label"></label>
+        <input
+          type="text"
+          class="input"
+          id="problemCode"
+          placeholder="TTM-XXXXXX"
+        />
+      </div>
+
+      <div class="field">
+        <label for="participantName" data-i18n="participant_name_label"></label>
+        <input
+          type="text"
+          class="input"
+          id="participantName"
+          data-i18n="participant_name_placeholder"
+        />
+      </div>
+
+      <p id="joinError" class="error-message" hidden data-i18n="join_error"></p>
+
+      <div class="actions">
+        <a class="btn secondary" href="index.html" data-i18n="back"></a>
+        <button class="btn" type="submit" data-i18n="join_button"></button>
+      </div>
+
+    </form>
+
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+
+  <script type="module">
+
+    import { db } from './js/firebase-config.js';
+
+    import {
+      doc,
+      getDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('joinProblemForm');
+      const problemCodeInput = document.getElementById('problemCode');
+      const participantNameInput = document.getElementById('participantName');
+      const joinError = document.getElementById('joinError');
+
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+
+        const code = problemCodeInput.value.trim().toUpperCase();
+        const participantName = participantNameInput.value.trim();
+
+        if (!participantName) {
+          joinError.hidden = false;
+          joinError.textContent = window.TTM?.t('participant_name_error') || 'Please enter your name.';
+          return;
+        }
+
+        const problemRef = doc(db, "problems", code);
+
+        const problemSnapshot = await getDoc(problemRef);
+
+        if (!problemSnapshot.exists()) {
+          joinError.hidden = false;
+          return;
+        }
+
+        const problem = problemSnapshot.data();
+
+        if (!problem) {
+          joinError.hidden = false;
+          return;
+        }
+
+        localStorage.setItem('ttm_problem', JSON.stringify(problem));
+        localStorage.setItem('ttm_participant', JSON.stringify({
+          name: participantName,
+          role: 'participant'
+        }));
+        localStorage.setItem('n', String(problem.alternatives.length));
+        localStorage.setItem('movies', problem.alternatives.join(','));
+
+        window.location.href = 'step3.html';
+      });
+    });
+  </script>
+
+</body>
+</html>

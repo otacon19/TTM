@@ -171,7 +171,7 @@
 
         updateQuestionsUI();
 
-        document.getElementById('continueBtn').addEventListener('click', ()=>{
+        document.getElementById('continueBtn').addEventListener('click', async ()=>{
         const rankOk = document.querySelector('input[name="rankOk"]:checked')?.value;
         const cardsOk = document.querySelector('input[name="cardsOk"]:checked')?.value;
 
@@ -183,6 +183,13 @@
           window.location.href = 'step5.html';
         } else {
           localStorage.setItem('reviewDecision','finish');
+
+          if (typeof saveCurrentParticipantResult === 'function') {
+            await saveCurrentParticipantResult({
+              completedFrom: 'step4'
+            });
+          }
+
           window.location.href = 'goodbye.html';
         }
       });

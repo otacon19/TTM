@@ -2,6 +2,64 @@
 (() => {
   const I18N = {
     en: {
+      home_title: "Tournament Tree Method",
+
+      home_description:
+        "Select whether you want to create a new problem or participate in an existing one.",
+
+      home_create_title: "Create a problem",
+
+      home_create_description:
+        "Create a new decision problem and define the alternatives to compare.",
+
+      home_join_title: "Participate in a problem",
+
+      home_join_description:
+        "Access an existing problem using a participation code.",
+
+      create_title: "Create a problem",
+
+      create_description:
+        "Define the problem and the alternatives that participants will compare.",
+
+      create_problem_name_label: "Problem name",
+
+      create_problem_name_placeholder: "Enter the problem name",
+
+      create_alternatives_number_label: "Number of alternatives",
+
+      create_alternatives_names_label: "Alternative names",
+
+      create_problem_button: "Create problem",
+
+      back: "Back",
+      
+      join_title: "Participate in a problem",
+
+      join_description:
+        "Enter the problem code provided by the creator.",
+
+      join_code_label: "Problem code",
+
+      join_button: "Access problem",
+
+      join_error:
+        "No problem was found with that code.",
+
+      problem_created_title: "Problem created",
+
+      problem_created_description:
+        "Share this code with the participants so they can access the problem.",
+
+      continue: "Continue",
+
+      participant_name_label: "Your name or alias",
+
+      participant_name_placeholder: "Enter your name or alias",
+
+      participant_name_error:
+        "Please enter your name or alias.",
+
       index_title: "Tournament Tree Method",
       index_description:
         "The purpose of this tool is for users to test a new preference collection methodology called the Tournament Tree Method. To do this, you will be asked to list a series of objects, at your discretion, and compare them with each other.",
@@ -75,6 +133,65 @@
     
     },
     es: {
+
+      home_title: "Tournament Tree Method",
+
+      home_description:
+        "Seleccione si desea crear un nuevo problema o participar en uno existente.",
+
+      home_create_title: "Crear un problema",
+
+      home_create_description:
+        "Cree un nuevo problema de decisión y defina las alternativas a comparar.",
+
+      home_join_title: "Participar en un problema",
+
+      home_join_description:
+        "Acceda a un problema existente mediante un código de participación.",
+
+      create_title: "Crear un problema",
+
+      create_description:
+        "Defina el problema y las alternativas que los participantes deberán comparar.",
+
+      create_problem_name_label: "Nombre del problema",
+
+      create_problem_name_placeholder: "Introduzca el nombre del problema",
+
+      create_alternatives_number_label: "Número de alternativas",
+
+      create_alternatives_names_label: "Nombres de las alternativas",
+
+      create_problem_button: "Crear problema",
+
+      back: "Volver",
+      
+      join_title: "Participar en un problema",
+
+      join_description:
+        "Introduzca el código del problema proporcionado por el creador.",
+
+      join_code_label: "Código del problema",
+
+      join_button: "Acceder al problema",
+
+      join_error:
+        "No se ha encontrado ningún problema con ese código.",
+
+      problem_created_title: "Problema creado",
+
+      problem_created_description:
+        "Comparta este código con los participantes para que puedan acceder al problema.",
+
+      continue: "Continuar",
+
+      participant_name_label: "Su nombre o alias",
+
+      participant_name_placeholder: "Introduzca su nombre o alias",
+
+      participant_name_error:
+        "Introduzca su nombre o alias.",
+
       index_title: "Tournament Tree Method",
       index_description:
         "El propósito de esta herramienta es que los usuarios testeen una nueva metodología de recolección de preferencias denominada Tournament Tree Method. Para ello, se le pedirá que liste una serie de objetos, a su criterio, y que los compare entre sí.",

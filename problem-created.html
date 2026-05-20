@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TTM</title>
+  <title>TTM - Problem created</title>
 
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
-  <meta name="theme-color" content="#3498db" />
 </head>
+
 <body>
+
   <div class="site-logo">
     <a href="" target="_blank" rel="noopener">
       <img src="img/logo.png" alt="Tournament Tree Method" />
@@ -25,30 +26,41 @@
     </button>
   </div>
 
-<main class="card" role="main">
-  <header class="page-header">
-    <h1 id="title" data-i18n="home_title"></h1>
-  </header>
+  <main class="card" role="main">
 
-  <p id="description" data-i18n="home_description"></p>
+    <header class="page-header">
+      <h1 data-i18n="problem_created_title"></h1>
+    </header>
 
-  <div class="home-options">
+    <p data-i18n="problem_created_description"></p>
 
-    <a class="home-card" href="create.html">
-      <h2 data-i18n="home_create_title"></h2>
-      <p data-i18n="home_create_description"></p>
-    </a>
+    <div class="problem-code-box">
+      <span id="problemCode"></span>
+    </div>
 
-    <a class="home-card" href="join.html">
-      <h2 data-i18n="home_join_title"></h2>
-      <p data-i18n="home_join_description"></p>
-    </a>
+    <div class="actions">
+      <a class="btn secondary" href="index.html" data-i18n="back"></a>
+      <a class="btn" href="step3.html" data-i18n="continue"></a>
+      <a class="btn secondary" href="results.html">View results</a>
+    </div>
 
-  </div>
-</main>
+  </main>
 
-  <!-- Importante: i18n primero, luego app -->
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const problem = JSON.parse(localStorage.getItem('ttm_problem') || 'null');
+
+      if (!problem) {
+        window.location.href = 'index.html';
+        return;
+      }
+
+      document.getElementById('problemCode').textContent = problem.code;
+    });
+  </script>
+
 </body>
 </html>

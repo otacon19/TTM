@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TTM - Create problem</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <meta name="theme-color" content="#3498db" />
+</head>
+
+<body>
+
+  <div class="site-logo">
+    <a href="" target="_blank" rel="noopener">
+      <img src="img/logo.png" alt="Tournament Tree Method" />
+    </a>
+  </div>
+
+  <div class="lang-switch" role="group" aria-label="Language selector">
+    <button type="button" id="btn-en" title="English" aria-label="English">
+      <img src="img/english.png" alt="English flag" />
+    </button>
+    <button type="button" id="btn-es" title="Español" aria-label="Español">
+      <img src="img/spanish.png" alt="Bandera de España" />
+    </button>
+  </div>
+
+  <main class="card" role="main">
+    <header class="page-header">
+      <h1 data-i18n="create_title"></h1>
+    </header>
+
+    <p data-i18n="create_description"></p>
+
+    <form class="form" id="createProblemForm" novalidate>
+
+      <div class="field">
+        <label for="problemName" data-i18n="create_problem_name_label"></label>
+        <input
+          type="text"
+          class="input"
+          id="problemName"
+          data-i18n="create_problem_name_placeholder"
+        />
+      </div>
+
+      <div class="field">
+        <label for="creatorName" data-i18n="participant_name_label"></label>
+        <input
+          type="text"
+          class="input"
+          id="creatorName"
+          data-i18n="participant_name_placeholder"
+        />
+      </div>
+
+      <div class="field">
+        <label for="alternativesNumber" data-i18n="create_alternatives_number_label"></label>
+        <input
+          type="number"
+          class="input"
+          id="alternativesNumber"
+          min="3"
+          max="6"
+          step="1"
+          value="3"
+        />
+      </div>
+
+      <div class="field">
+        <label data-i18n="create_alternatives_names_label"></label>
+        <div id="alternativesList" class="text-box-container"></div>
+      </div>
+
+      <div class="actions">
+        <a class="btn secondary" href="index.html" data-i18n="back"></a>
+        <button id="createProblemButton" class="btn" type="submit" data-i18n="create_problem_button"></button>
+      </div>
+
+    </form>
+  </main>
+
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+
+  <script type="module">
+
+    import { db } from './js/firebase-config.js';
+
+    import {
+      doc,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('createProblemForm');
+      const problemNameInput = document.getElementById('problemName');
+      const alternativesNumberInput = document.getElementById('alternativesNumber');
+      const creatorNameInput = document.getElementById('creatorName');
+      const alternativesList = document.getElementById('alternativesList');
+      const createButton = document.getElementById('createProblemButton');
+
+      function getNumberOfAlternatives() {
+        return Math.max(3, Math.min(6, parseInt(alternativesNumberInput.value || '3', 10)));
+      }
+
+      function renderAlternativeInputs() {
+        const n = getNumberOfAlternatives();
+        alternativesList.innerHTML = '';
+
+        for (let i = 1; i <= n; i++) {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.className = 'input text-box';
+          input.setAttribute('data-i18n', 'movie_placeholder');
+          input.setAttribute('data-i', String(i));
+          input.addEventListener('input', validateForm);
+          alternativesList.appendChild(input);
+        }
+
+        if (window.TTM?.refresh) window.TTM.refresh();
+        validateForm();
+      }
+
+      function validateForm() {
+        const alternatives = Array.from(alternativesList.querySelectorAll('input'));
+        const hasProblemName = problemNameInput.value.trim().length > 0;
+        const hasCreatorName = creatorNameInput.value.trim().length > 0;
+        const allAlternativesFilled = alternatives.every(input => input.value.trim().length > 0);
+
+        createButton.disabled = !(hasProblemName && hasCreatorName && allAlternativesFilled);
+      }
+
+      alternativesNumberInput.addEventListener('change', renderAlternativeInputs);
+      alternativesNumberInput.addEventListener('input', renderAlternativeInputs);
+      problemNameInput.addEventListener('input', validateForm);
+      creatorNameInput.addEventListener('input', validateForm);
+
+      form.addEventListener('submit', async (ev) => {
+        ev.preventDefault();
+
+        const alternatives = Array.from(alternativesList.querySelectorAll('input'))
+          .map(input => input.value.trim());
+
+        const problemCode = 'TTM-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+        const problem = {
+          code: problemCode,
+          name: problemNameInput.value.trim(),
+          alternatives: alternatives,
+          createdAt: new Date().toISOString()
+        };
+
+        const problems = JSON.parse(localStorage.getItem('ttm_problems') || '{}');
+        problems[problemCode] = problem;
+
+        localStorage.setItem('ttm_problems', JSON.stringify(problems));
+        localStorage.setItem('ttm_problem', JSON.stringify(problem));
+        await setDoc(
+          doc(db, "problems", problemCode),
+          problem
+        );
+        localStorage.setItem('ttm_participant', JSON.stringify({
+          name: creatorNameInput.value.trim(),
+          role: 'creator'
+        }));
+        localStorage.setItem('n', String(alternatives.length));
+        localStorage.setItem('movies', alternatives.join(','));
+
+        window.location.href = 'problem-created.html';
+      });
+
+      renderAlternativeInputs();
+    });
+  </script>
+
+</body>
+</html>

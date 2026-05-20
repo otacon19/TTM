@@ -15,11 +15,14 @@
     bindLanguageButtons();
     
     const form = document.getElementById("form");
-    form.addEventListener("submit", (ev) => {
-      ev.preventDefault();
-      const nextUrl = form.getAttribute('data-next') || 'step1.html';
-      window.location.href = `${nextUrl}`;
-    });
+
+    if (form) {
+      form.addEventListener("submit", (ev) => {
+        ev.preventDefault();
+        const nextUrl = form.getAttribute("data-next") || "step1.html";
+        window.location.href = `${nextUrl}`;
+      });
+    }
   }
 
   document.addEventListener("DOMContentLoaded", init);
