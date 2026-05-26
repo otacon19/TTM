@@ -1,0 +1,323 @@
+// ===== i18n helper =====
+function t(key, data = {}) {
+    if (window.TTM?.t) {
+        const str = window.TTM.t(key) || '';
+        return str.replace(/\{(\w+)\}/g, (_, k) => (data[k] != null ? String(data[k]) : '{' + k + '}'));
+    }
+    return key;
+}
+
+// ===== Datos base =====
+const movies = (localStorage.getItem('movies') || '').split(',').filter(Boolean);
+const n = movies.length;
+const L = JSON.parse(localStorage.getItem('matrixL') || '[]');
+const reviewDecision = localStorage.getItem('reviewDecision') || 'adjust_cards'; // 'adjust_cards' | 'recompare_sequential'
+
+
+// Utilidad: validar que 'order' es una permutación 0..n-1
+function isValidOrder(order, n) {
+    if (!Array.isArray(order) || order.length !== n) return false;
+    const seen = new Set(order);
+    if (seen.size !== n) return false;
+    for (let i = 0; i < n; i++) if (!seen.has(i)) return false;
+    return true;
+}
+
+// Órdenes:
+// - orderRef: SIEMPRE el ranking calculado (para la tabla de referencia)
+// - orderEff: el ranking efectivo para trabajar en este paso (override si existe, si no el calculado)
+const overrideOrder = JSON.parse(localStorage.getItem('overrideOrder') || 'null');
+const lastComputedOrder = JSON.parse(localStorage.getItem('lastComputedOrder') || 'null');
+
+const defaultOrder = Array.from({ length: n }, (_, i) => i);
+const orderRef = Array.isArray(lastComputedOrder) ? lastComputedOrder : defaultOrder;
+// Solo usamos overrideOrder si:
+// - el usuario vino del flujo de reordenar (recompare_sequential)
+// - y el override es válido para el tamaño actual
+let orderEff;
+if (reviewDecision === 'recompare_sequential' && isValidOrder(overrideOrder, n)) {
+    orderEff = overrideOrder;
+} else {
+    orderEff = orderRef;
+    // (opcional) limpiaremos un override inválido/obsoleto
+    if (!isValidOrder(overrideOrder, n)) localStorage.removeItem('overrideOrder');
+}
+
+// ===== Reconstrucción y scores (referencia) =====
+function generatePR(L) {
+    const A = Array.from({ length: n }, () => Array(n).fill(0));
+    const N = Array.from({ length: n }, () => Array(n).fill(0));
+    for (let i = 0; i < n; i++) { A[i][i] = 0; N[i][i] = 1; }
+    for (let i = 0; i < Math.min(L.length, n); i++) {
+        const r1 = Math.floor(L[i][0]); const r2 = Math.floor(L[i][1]); const value = L[i][2] || 0;
+        A[r1][r2] = value; A[r2][r1] = -value; N[r1][r2] = N[r2][r1] = 1;
+    }
+    const w = Math.floor(L[Math.max(0, n - 2)]?.[0] || 0);
+    for (let i = 0; i < n - 1; i++) {
+        const li = Math.floor(L[Math.max(0, n - 2 - i)]?.[1] || 0);
+        const idx = Math.floor(L[Math.max(0, n - 2 - i)]?.[0] || 0);
+        if (N[w][li] === 0) { A[w][li] = A[w][idx] + A[idx][li]; A[li][w] = -A[w][li]; N[w][li] = N[li][w] = 1; }
+    }
+    for (let i = 0; i < n - 1; i++) { for (let j = i + 1; j < n; j++) { if (N[i][j] === 0) { A[i][j] = A[i][w] + A[w][j]; A[j][i] = -A[i][j]; N[i][j] = N[j][i] = 1; } } }
+    return A;
+}
+function calculateScores(matrix) {
+    let max = -Infinity, colIndex = -1;
+    matrix.forEach(row => row.forEach((val, j) => { if (val > max) { max = val; colIndex = j; } }));
+    const column = matrix.map(row => row[colIndex]);
+    return { max, column };
+}
+
+// ===== Índice de cartas directas (Step 3)
+function buildUserCardsIndex(L) {
+    const map = new Map();
+    for (let i = 0; i < L.length; i++) {
+        const w = Math.floor(L[i][0]);
+        const l = Math.floor(L[i][1]);
+        const val = L[i][2] || 0;       // 0 empate; >0 => cartas = val - 1
+        const cards = val > 0 ? (val - 1) : 0;
+        map.set(`${w}|${l}`, { cards, winner: w });
+    }
+    return map;
+}
+
+// ===== Cartas (abanico)
+const SUITS = [{ s: '♠', cls: 'suit-black' }, { s: '♣', cls: 'suit-black' }, { s: '♥', cls: 'suit-red' }, { s: '♦', cls: 'suit-red' }];
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+function makeCard() {
+    const div = document.createElement('div'); div.className = 'card-tile';
+    const face = document.createElement('div'); face.className = 'card-face';
+    const suit = SUITS[Math.floor(Math.random() * SUITS.length)];
+    const rank = RANKS[Math.floor(Math.random() * RANKS.length)];
+    div.classList.add(suit.cls);
+    const rEl = document.createElement('div'); rEl.className = 'card-rank'; rEl.textContent = rank;
+    const sEl = document.createElement('div'); sEl.className = 'card-suit'; sEl.textContent = suit.s;
+    face.append(rEl, sEl); div.appendChild(face);
+    return div;
+}
+function renderPile(container, count) {
+    container.innerHTML = '';
+    const MAX = 50;
+    const c = Math.min(MAX, Math.max(0, Math.round(count)));
+    const W = container.clientWidth, H = container.clientHeight;
+    const CARD_W = 76, CARD_H = 108;
+    const centerX = W / 2, baseY = Math.max(10, H - CARD_H - 10);
+    const spread = Math.min(22, Math.max(10, Math.floor((W - CARD_W) / Math.max(1, c))));
+    const angleStep = Math.min(6, Math.max(2, 140 / Math.max(2, c)));
+    const startAngle = - (angleStep * (c - 1)) / 2;
+
+    for (let i = 0; i < c; i++) {
+        const angleDeg = startAngle + i * angleStep;
+        const offsetX = (i - (c - 1) / 2) * spread;
+        const x = centerX + offsetX - CARD_W / 2;
+        const y = baseY - Math.abs(offsetX) * 0.08;
+        const card = makeCard();
+        card.style.left = `${x}px`;
+        card.style.top = `${y}px`;
+        card.style.transform = `rotate(${angleDeg + (Math.random() * 2 - 1)}deg)`;
+        card.style.zIndex = String(10 + i);
+        container.appendChild(card);
+    }
+    const badge = document.createElement('div'); badge.className = 'pile-count'; badge.textContent = String(c); container.appendChild(badge);
+}
+
+// ===== UI helpers
+function chipLabel(i) { return (t('movie_placeholder') || 'Object {i}').replace('{i}', String(i + 1)); }
+function chip(idx) {
+    const el = document.createElement('span'); el.className = 'movie-chip';
+    el.textContent = chipLabel(idx); el.title = movies[idx] || ''; return el;
+}
+function sentenceWin(a, b) {
+    const s = document.createElement('div'); s.className = 'sentence';
+    s.append(chip(a), document.createTextNode(' ' + t('step4_wins_connector') + ' '), chip(b)); return s;
+}
+
+// ===== Estado editable
+const rowsState = []; // [{a,b,cards}]
+
+// Modo "mostrar valores" en la tabla viva.
+// - adjust_cards: desde el inicio true (tenemos cartas de referencia)
+// - recompare_sequential: empieza false y pasa a true si el usuario añade alguna carta
+let liveTableShowValues = (reviewDecision === 'adjust_cards');
+
+function anyCardsSet() {
+    return rowsState.some(r => (r && (Number(r.cards) || 0) > 0));
+}
+
+function buildRow(rowIndex, a, b, initialCards) {
+    const grid = document.getElementById('pairsGrid');
+    const row = document.createElement('div'); row.className = 'pair-row';
+
+    const sentence = sentenceWin(a, b);
+
+    const pileWrap = document.createElement('div'); pileWrap.className = 'pile-wrap';
+    const pile = document.createElement('div'); pile.className = 'card-pile'; pileWrap.appendChild(pile);
+
+    const ctrls = document.createElement('div'); ctrls.className = 'controls';
+    const minus = document.createElement('button'); minus.className = 'ctrl-btn'; minus.textContent = '−';
+    const input = document.createElement('input'); input.className = 'ctrl-input'; input.type = 'number'; input.min = '0'; input.max = '50'; input.step = '1'; input.value = String(initialCards);
+    const plus = document.createElement('button'); plus.className = 'ctrl-btn'; plus.textContent = '+';
+    ctrls.append(minus, input, plus);
+
+    row.append(sentence, pileWrap, ctrls);
+    grid.appendChild(row);
+
+    rowsState[rowIndex] = { a, b, cards: Math.max(0, Math.min(50, Number(initialCards) || 0)) };
+    renderPile(pile, rowsState[rowIndex].cards);
+
+    function clamp(v) { v = parseInt(v || '0', 10); if (isNaN(v)) v = 0; return Math.max(0, Math.min(50, v)); }
+    function onChange() {
+
+        if (!liveTableShowValues && reviewDecision === 'recompare_sequential') {
+            if (anyCardsSet()) liveTableShowValues = true;
+        }
+
+        const v = clamp(input.value);
+        input.value = v;
+        rowsState[rowIndex].cards = v;
+        renderPile(pile, v);
+        updateLiveTable(); // refresca tabla en vivo con orderEff
+    }
+    minus.addEventListener('click', (e) => { e.preventDefault(); const cur = clamp(input.value); if (cur > 0) { input.value = cur - 1; onChange(); } });
+    plus.addEventListener('click', (e) => { e.preventDefault(); const cur = clamp(input.value); if (cur < 50) { input.value = cur + 1; onChange(); } });
+    input.addEventListener('input', onChange);
+}
+
+// === Tabla 1 (referencia) — usa orderRef
+function buildLeftTable(column, max) {
+    const tbody = document.getElementById('rankBody');
+    tbody.innerHTML = '';
+
+    const maxAbs = Math.max(1, Math.abs(max || 1)); // divisor para normalizar
+    for (let i = 0; i < orderRef.length; i++) {
+        const idx = orderRef[i];
+        const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
+
+        const tdRank = document.createElement('td'); tdRank.className = 'rank-num'; tdRank.textContent = String(i + 1);
+
+        const tdMovie = document.createElement('td');
+        const chipEl = document.createElement('span'); chipEl.className = 'movie-chip';
+        chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
+        tdMovie.appendChild(chipEl);
+
+        const tdScale = document.createElement('td');
+        tdScale.textContent = (column[idx] / maxAbs).toFixed(3);
+
+        const tdAccum = document.createElement('td');
+        tdAccum.textContent = String(Math.round(column[idx]));
+
+        tr.append(tdRank, tdMovie, tdScale, tdAccum);
+        tbody.appendChild(tr);
+    }
+}
+
+// === Tabla 2 (en vivo) — usa orderEff
+function updateLiveTable() {
+    const tbody = document.getElementById('rankBodyLive');
+    tbody.innerHTML = '';
+
+    // ¿Debemos mostrar valores numéricos?
+    // - En adjust_cards: siempre true
+    // - En recompare_sequential: solo cuando el usuario haya añadido alguna carta (>0)
+    const showValues = (reviewDecision === 'adjust_cards') || liveTableShowValues;
+
+    // Mapa cartas (a|b) -> número de cartas
+    const cardsToNext = new Map();
+    for (let k = 0; k < rowsState.length; k++) {
+        const { a, b, cards } = rowsState[k] || {};
+        if (a == null || b == null) continue;
+        cardsToNext.set(`${a}|${b}`, Number(cards) || 0);
+    }
+
+    // Acumulados desde el final con orderEff
+    const accum = Array(n).fill(0);
+    if (orderEff.length > 0) {
+        accum[orderEff[orderEff.length - 1]] = 0;
+        for (let i = orderEff.length - 2; i >= 0; i--) {
+            const a = orderEff[i], b = orderEff[i + 1];
+            const c = cardsToNext.get(`${a}|${b}`) || 0;
+            accum[a] = (accum[b] + c + 1);
+        }
+    }
+
+    const accValues = orderEff.map(idx => accum[idx]);
+    const maxAcc = Math.max(...accValues, 1);
+
+    for (let i = 0; i < orderEff.length; i++) {
+        const idx = orderEff[i];
+        const tr = document.createElement('tr'); tr.dataset.idx = String(idx);
+
+        const tdRank = document.createElement('td'); tdRank.className = 'rank-num'; tdRank.textContent = String(i + 1);
+
+        const tdMovie = document.createElement('td');
+        const chipEl = document.createElement('span'); chipEl.className = 'movie-chip';
+        chipEl.textContent = chipLabel(idx); chipEl.title = movies[idx] || '';
+        tdMovie.appendChild(chipEl);
+
+        const tdScale = document.createElement('td');
+        tdScale.textContent = (accum[idx] / maxAcc).toFixed(3);
+
+        const tdAccum = document.createElement('td');
+        tdAccum.textContent = String(accum[idx]);
+
+        tr.append(tdRank, tdMovie, tdScale, tdAccum);
+        tbody.appendChild(tr);
+    }
+}
+
+// Construye la derecha (mazos) según orderEff
+function buildRightGrid(column, directIdx) {
+    const grid = document.getElementById('pairsGrid'); grid.innerHTML = '';
+    for (let k = 0; k < orderEff.length - 1; k++) {
+        const a = orderEff[k], b = orderEff[k + 1];
+        let initialCards = 0;
+
+        if (reviewDecision === 'adjust_cards') {
+            // Si hubo comparación directa, usar esas cartas; si no, usar diff(column) - 1
+            const key1 = `${a}|${b}`, key2 = `${b}|${a}`;
+            if (directIdx.has(key1)) initialCards = directIdx.get(key1).cards;
+            else if (directIdx.has(key2)) initialCards = directIdx.get(key2).cards;
+            else initialCards = Math.max(0, Math.round(column[a] - column[b]) - 1);
+        } else {
+            // Recompare secuencial: empiezan en 0
+            initialCards = 0;
+        }
+
+        buildRow(k, a, b, initialCards);
+    }
+}
+
+async function onSave() {
+    localStorage.setItem('step5Cards', JSON.stringify(rowsState));
+    localStorage.setItem('step5Mode', reviewDecision); // 'adjust_cards' | 'recompare_sequential'
+
+    if (typeof saveCurrentParticipantResult === 'function') {
+        await saveCurrentParticipantResult({
+            completedFrom: 'step5'
+        });
+    }
+
+    window.location.href = 'goodbye.html';
+}
+
+function init() {
+    // Intro según flujo elegido
+    document.getElementById('introText').setAttribute('data-i18n', 'step5_intro');
+    if (window.TTM?.refresh) window.TTM.refresh();
+
+    const A = generatePR(L);
+    const scores = calculateScores(A);
+    const column = scores.column.slice();
+    const max = scores.max;
+    const directIdx = buildUserCardsIndex(L);
+
+    // Tabla 1 (SIEMPRE orderRef)
+    buildLeftTable(column, max);
+
+    // Cartas y tabla viva (orderEff)
+    buildRightGrid(column, directIdx);
+    updateLiveTable();
+
+    document.getElementById('saveBtn').addEventListener('click', onSave);
+}
+document.addEventListener('DOMContentLoaded', init);

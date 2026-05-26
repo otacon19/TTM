@@ -34,14 +34,26 @@
 
     <p data-i18n="problem_created_description"></p>
 
+    <h2 data-i18n="participation_code_title"></h2>
     <div class="problem-code-box">
       <span id="problemCode"></span>
+    </div>
+
+    <h2 data-i18n="creator_code_title"></h2>
+    <p data-i18n="creator_code_description"></p>
+    <div class="problem-code-box">
+      <span id="creatorCode"></span>
     </div>
 
     <div class="actions">
       <a class="btn secondary" href="index.html" data-i18n="back"></a>
       <a class="btn" href="step3.html" data-i18n="continue"></a>
-      <a class="btn secondary" href="results.html">View results</a>
+      <a
+        class="btn secondary"
+        href="results.html"
+        target="_blank"
+        data-i18n="view_results">
+      </a>
     </div>
 
   </main>
@@ -59,6 +71,7 @@
       }
 
       document.getElementById('problemCode').textContent = problem.code;
+      document.getElementById('creatorCode').textContent = problem.creatorCode;
     });
   </script>
 

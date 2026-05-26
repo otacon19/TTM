@@ -1,17 +1,16 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TTM - Join problem</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TTM - Admin Access</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body>
 
-  <div class="site-logo">
+    <div class="site-logo">
     <a href="" target="_blank" rel="noopener">
       <img src="img/logo.png" alt="Tournament Tree Method" />
     </a>
@@ -29,38 +28,49 @@
   <main class="card" role="main">
 
     <header class="page-header">
-      <h1 data-i18n="join_title"></h1>
+      <h1 data-i18n="admin_access_title"></h1>
     </header>
 
-    <p data-i18n="join_description"></p>
+    <p class="lead" data-i18n="admin_description"></p>
 
-    <form class="form" id="joinProblemForm" novalidate>
+    <form id="adminForm" class="form">
 
       <div class="field">
-        <label for="problemCode" data-i18n="join_code_label"></label>
+        <label for="problemCode" data-i18n="problem_code"></label>
         <input
           type="text"
-          class="input"
           id="problemCode"
+          class="input"
+          required
           placeholder="TTM-XXXXXX"
         />
       </div>
 
       <div class="field">
-        <label for="participantName" data-i18n="participant_name_label"></label>
+        <label for="creatorCode" data-i18n="creator_code"></label>
         <input
           type="text"
+          id="creatorCode"
           class="input"
-          id="participantName"
-          data-i18n="participant_name_placeholder"
+          required
+          placeholder="ADM-XXXXXX"
         />
       </div>
 
-      <p id="joinError" class="error-message" hidden data-i18n="join_error"></p>
+      <p id="adminError" class="error-message" hidden></p>
 
       <div class="actions">
-        <a class="btn secondary" href="index.html" data-i18n="back"></a>
-        <button class="btn" type="submit" data-i18n="join_button"></button>
+        <button
+          type="submit"
+          class="btn"
+          data-i18n="view_results">
+        </button>
+
+        <a
+          href="index.html"
+          class="btn secondary"
+          data-i18n="back_home">
+        </a>
       </div>
 
     </form>
@@ -69,7 +79,7 @@
 
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
-  <script type="module" src="js/join.js"></script>
+  <script type="module" src="js/admin.js"></script>
 
 </body>
 </html>

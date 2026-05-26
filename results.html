@@ -11,89 +11,25 @@
 
   <main class="card" role="main">
     <header class="page-header">
-      <h1>Problem results</h1>
+      <h1 data-i18n="results_title"></h1>
     </header>
 
     <section id="problemInfo"></section>
 
-    <h2>Participants</h2>
+    <h2 data-i18n="results_participants_title"></h2>
     <div id="resultsContainer"></div>
 
     <div class="actions">
-      <a class="btn secondary" href="index.html">Back to home</a>
+      <button id="toggleProblemStatusBtn" class="btn"></button>
+      <button id="exportJsonBtn" class="btn secondary" data-i18n="export_json"></button>
+
+      <a class="btn secondary" href="index.html" data-i18n="back_home"></a>
     </div>
   </main>
 
-  <script type="module">
-    import { db } from './js/firebase-config.js';
-
-    import {
-      collection,
-      query,
-      where,
-      getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
-    document.addEventListener('DOMContentLoaded', async () => {
-      const problem = JSON.parse(localStorage.getItem('ttm_problem') || 'null');
-
-      const problemInfo = document.getElementById('problemInfo');
-      const resultsContainer = document.getElementById('resultsContainer');
-
-      if (!problem) {
-        problemInfo.innerHTML = '<p>No active problem found.</p>';
-        return;
-      }
-
-      problemInfo.innerHTML = `
-        <p><strong>Problem:</strong> ${problem.name}</p>
-        <p><strong>Code:</strong> ${problem.code}</p>
-        <p><strong>Alternatives:</strong> ${problem.alternatives.join(', ')}</p>
-        <p><strong>Loading results...</strong></p>
-      `;
-
-      const resultsQuery = query(
-        collection(db, "results"),
-        where("problemCode", "==", problem.code)
-      );
-
-      const snapshot = await getDocs(resultsQuery);
-
-      const results = [];
-      snapshot.forEach(doc => {
-        results.push(doc.data());
-      });
-
-      problemInfo.innerHTML = `
-        <p><strong>Problem:</strong> ${problem.name}</p>
-        <p><strong>Code:</strong> ${problem.code}</p>
-        <p><strong>Alternatives:</strong> ${problem.alternatives.join(', ')}</p>
-        <p><strong>Number of responses:</strong> ${results.length}</p>
-      `;
-
-      if (results.length === 0) {
-        resultsContainer.innerHTML = '<p>No participant results have been saved yet.</p>';
-        return;
-      }
-
-      resultsContainer.innerHTML = results.map((result, index) => {
-        const ranking = Array.isArray(result.rankingOrder)
-          ? result.rankingOrder.map(i => result.alternatives[i] ?? `Alternative ${i + 1}`).join(' > ')
-          : 'No ranking available';
-
-        return `
-          <div class="result-card">
-            <h3>Participant ${index + 1}: ${result.participantName}</h3>
-            <p><strong>Role:</strong> ${result.participantRole}</p>
-            <p><strong>Ranking:</strong> ${ranking}</p>
-            <p><strong>Review decision:</strong> ${result.reviewDecision || '-'}</p>
-            <p><strong>Completed from:</strong> ${result.completedFrom || '-'}</p>
-            <p><strong>Finished at:</strong> ${result.finishedAt || '-'}</p>
-          </div>
-        `;
-      }).join('');
-    });
-  </script>
+  <script src="js/i18n.js"></script>
+  <script src="js/app.js"></script>
+  <script type="module" src="js/results-page.js"></script>
 
 </body>
 </html>
