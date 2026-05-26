@@ -53,6 +53,8 @@
       participant_name_placeholder: "Enter your name or alias",
       participant_name_error: "Please enter your name or alias.",
       participation_code_title: "Participation code",
+      copy_code: "Copy code",
+      copied: "Copied!",
 
       // ======================================================
       // ADMIN
@@ -98,6 +100,7 @@
       loading_results: "Loading results...",
       export_json: "Export JSON",
       view_results: "View results",
+      download_results: "Download results",
 
       // ======================================================
       // COMMON
@@ -197,6 +200,7 @@
 
       goodbye_title: "Thank you for using the tool!",
       goodbye_restart: "Start over",
+      goodbye_saved: "Your response has been saved successfully.",
 
     },
     es: {
@@ -252,6 +256,8 @@
       participation_code_title: "Código de participación",
       results_title: "Resultados del problema",
       results_participants_title: "Participantes",
+      copy_code: "Copiar código",
+      copied: "¡Copiado!",
 
       // ======================================================
       // ADMIN
@@ -295,6 +301,7 @@
       view_results: "Ver resultados",
       loading_results: "Cargando resultados...",
       export_json: "Exportar JSON",
+      download_results: "Descargar resultados",
 
 
       // ======================================================
@@ -397,6 +404,8 @@
 
       goodbye_title: "¡Gracias por usar la herramienta!",
       goodbye_restart: "Volver a empezar",
+      goodbye_saved: "Su respuesta se ha guardado correctamente.",
+      
     },
   };
 
