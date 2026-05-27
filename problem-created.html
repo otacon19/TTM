@@ -41,21 +41,15 @@
       <span id="problemCode"></span>
     </div>
 
-    <button id="copyProblemCodeBtn" class="btn secondary small" data-i18n="copy_code">
-    </button>
-
     <h2 data-i18n="creator_code_title"></h2>
     <p data-i18n="creator_code_description"></p>
     <div class="problem-code-box">
       <span id="creatorCode"></span>
     </div>
 
-    <button id="copyCreatorCodeBtn" class="btn secondary small" data-i18n="copy_code">
-    </button>
-
     <div class="actions">
       <a class="btn secondary" href="index.html" data-i18n="back"></a>
-      <a class="btn" href="step3.html" data-i18n="continue"></a>
+      <a class="btn" href="step3.html" data-i18n="evaluate"></a>
       <a class="btn secondary" href="results.html" target="_blank" data-i18n="view_results">
       </a>
     </div>
@@ -77,25 +71,6 @@
       document.getElementById('problemCode').textContent = problem.code;
       document.getElementById('creatorCode').textContent = problem.creatorCode;
 
-      const copyProblemCodeBtn =
-        document.getElementById('copyProblemCodeBtn');
-
-      const copyCreatorCodeBtn =
-        document.getElementById('copyCreatorCodeBtn');
-
-      copyProblemCodeBtn?.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(problem.code);
-
-        copyProblemCodeBtn.textContent =
-          window.TTM?.t('copied') || 'Copied!';
-      });
-
-      copyCreatorCodeBtn?.addEventListener('click', async () => {
-        await navigator.clipboard.writeText(problem.creatorCode);
-
-        copyCreatorCodeBtn.textContent =
-          window.TTM?.t('copied') || 'Copied!';
-      });
     });
   </script>
 

@@ -108,7 +108,7 @@
 
       back_home: "Back to home",
       back: "Back",
-      continue: "Continue",
+      evaluate: "Evaluate",
       participant: "Participant",
 
       // ======================================================
@@ -356,7 +356,7 @@
       // COMMON
       // ======================================================
       back_home: "Volver al inicio",
-      continue: "Continuar",
+      evaluate: "Evaluar",
       participant: "Participante",
       back: "Volver",
 
