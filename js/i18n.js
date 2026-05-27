@@ -41,6 +41,7 @@
       join_button: "Access problem",
       join_error:
         "No problem was found with that code.",
+      problem_code_error: "Please enter the problem code.",
 
       // ======================================================
       // PROBLEM CREATED
@@ -289,6 +290,7 @@
       join_code_label: "Código del problema",
       join_button: "Acceder al problema",
       join_error: "No se ha encontrado ningún problema con ese código.",
+      problem_code_error: "Introduzca el código del problema.",
 
       // ======================================================
       // PROBLEM CREATED
