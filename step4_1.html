@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TTM · Step 4.1 (Edit ranking)</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <meta name="theme-color" content="#3498db" />
 
@@ -16,10 +18,12 @@
       border-radius: 12px;
       padding: 14px;
     }
+
     .panel h2 {
       margin: 0 0 6px;
       font-size: 17px;
     }
+
     .lead {
       color: var(--muted);
       margin-top: 4px;
@@ -30,17 +34,20 @@
       border-collapse: collapse;
       margin-top: 6px;
     }
+
     .rank-table th,
     .rank-table td {
       padding: 8px 6px;
       border-bottom: 1px solid #f1f5f9;
       text-align: left;
     }
+
     .rank-table th {
       font-weight: 700;
       font-size: 13px;
       color: #6b7280;
     }
+
     .rank-num {
       width: 52px;
       color: #6b7280;
@@ -63,9 +70,11 @@
     .draggable {
       user-select: none;
     }
+
     .dragging {
       opacity: 0.6;
     }
+
     .hint {
       font-size: 12px;
       color: #6b7280;
@@ -78,12 +87,14 @@
       justify-content: center;
       margin-top: 14px;
     }
+
     .navigate-button {
       width: 220px;
       height: 46px;
     }
   </style>
 </head>
+
 <body>
   <div class="site-logo">
     <a href="" target="_blank" rel="noopener">
@@ -101,11 +112,43 @@
   </div>
 
   <main class="card" role="main">
+
+    <div class="progress-wrapper">
+
+      <div class="progress-label" data-i18n="step4_1_progress">
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step"></div>
+      </div>
+
+    </div>
+
     <header class="page-header">
       <h1 id="title" data-i18n="step4r_title"></h1>
-      <p class="lead" data-i18n="step4r_hint_drag">
+      <!--<p class="lead" data-i18n="step4r_hint_drag">-->
       </p>
     </header>
+
+    <section class="info-box">
+
+      <h3 data-i18n="step4_1_info_title"></h3>
+
+      <p data-i18n="step4_1_info_description"></p>
+
+      <div class="info-example">
+
+        <div data-i18n="step4_1_info_drag"></div>
+
+        <div data-i18n="step4_1_info_top"></div>
+
+      </div>
+
+    </section>
 
     <section class="panel" aria-labelledby="rankingTitle">
       <h2 id="rankingTitle" data-i18n="step4r_title"></h2>
@@ -238,4 +281,5 @@
     document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
+
 </html>

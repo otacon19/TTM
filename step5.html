@@ -1,63 +1,226 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TTM · Step 5</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <meta name="theme-color" content="#3498db" />
 
   <style>
-    .layout { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; }
-    @media (max-width: 980px) { .layout { grid-template-columns: 1fr; } }
+    .layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 16px;
+    }
 
-    .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; }
-    .panel h2 { margin: 0 0 6px; font-size: 17px; }
-    .lead { color: var(--muted); margin-top: 4px; }
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+    }
 
-    .rank-table { width: 100%; border-collapse: collapse; margin-top: 6px; }
-    .rank-table th, .rank-table td { padding: 8px 6px; border-bottom: 1px solid #f1f5f9; text-align: left; }
-    .rank-table th { font-weight: 700; font-size: 13px; color: #6b7280; }
-    .rank-num { width: 52px; color: #6b7280; }
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 6px;
+      font-size: 17px;
+    }
+
+    .lead {
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .rank-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 6px;
+    }
+
+    .rank-table th,
+    .rank-table td {
+      padding: 8px 6px;
+      border-bottom: 1px solid #f1f5f9;
+      text-align: left;
+    }
+
+    .rank-table th {
+      font-weight: 700;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    .rank-num {
+      width: 52px;
+      color: #6b7280;
+    }
 
     .movie-chip {
-      display: inline-flex; align-items: center; gap: 6px;
-      padding: 3px 9px; border: 1px solid #e5e7eb; border-radius: 999px;
-      background: #fff; box-shadow: 0 1px 2px rgba(16,24,40,.06);
-      font-size: 13px; color: #374151; cursor: help;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border: 1px solid #e5e7eb;
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(16, 24, 40, .06);
+      font-size: 13px;
+      color: #374151;
+      cursor: help;
     }
 
-    .pairs-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
-    .pair-row { display: grid; grid-template-rows: auto auto auto; gap: 8px; justify-items: center; align-items: start; }
-    .sentence { font-size: 14px; color: #374151; text-align: center; }
+    .pairs-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
 
-    .pile-wrap { display: flex; justify-content: center; }
+    .pair-row {
+      display: grid;
+      grid-template-rows: auto auto auto;
+      gap: 8px;
+      justify-items: center;
+      align-items: start;
+    }
+
+    .sentence {
+      font-size: 14px;
+      color: #374151;
+      text-align: center;
+    }
+
+    .pile-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
     .card-pile {
-      position: relative; width: 520px; height: 160px;
-      background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 10px; padding: 8px; overflow: hidden;
+      position: relative;
+      width: 520px;
+      height: 160px;
+      background: #f9fafb;
+      border: 1px dashed #d1d5db;
+      border-radius: 10px;
+      padding: 8px;
+      overflow: hidden;
     }
-    .pile-count { position: absolute; bottom: 6px; right: 8px; font-size: 11px; color: #374151; background: rgba(255,255,255,.9); padding: 1px 6px; border-radius: 999px; border: 1px solid #e5e7eb; }
 
-    .card-tile { position: absolute; width: 76px; height: 108px; border-radius: 8px; background: #fff; border: 1px solid #e5e7eb; box-shadow: 0 4px 10px rgba(0,0,0,.10); transform-origin: 50% 80%; user-select: none; }
-    .card-face { position: absolute; inset: 6px; border-radius: 7px; background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(249,250,251,0.92)); }
-    .card-rank, .card-suit { position: absolute; font-size: 13px; font-weight: 700; line-height: 1; }
-    .card-rank { top: 6px; left: 8px; }
-    .card-suit { bottom: 6px; right: 8px; transform: rotate(180deg); }
-    .suit-red .card-rank, .suit-red .card-suit { color: #dc2626; }
-    .suit-black .card-rank, .suit-black .card-suit { color: #111827; }
+    .pile-count {
+      position: absolute;
+      bottom: 6px;
+      right: 8px;
+      font-size: 11px;
+      color: #374151;
+      background: rgba(255, 255, 255, .9);
+      padding: 1px 6px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+    }
 
-    .controls { display: flex; gap: 8px; align-items: center; justify-content: center; }
-    .ctrl-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 700; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-    .ctrl-input { width: 72px; height: 36px; text-align: center; border-radius: 8px; border: 1px solid #d1d5db; }
+    .card-tile {
+      position: absolute;
+      width: 76px;
+      height: 108px;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, .10);
+      transform-origin: 50% 80%;
+      user-select: none;
+    }
 
-    .footer { margin-top: 18px; display: grid; justify-items: center; gap: 10px; }
-    .navigate-button { width: 220px; height: 46px; }
+    .card-face {
+      position: absolute;
+      inset: 6px;
+      border-radius: 7px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(249, 250, 251, 0.92));
+    }
 
-    @media (max-width: 720px) { .card-pile { width: 92vw; } }
+    .card-rank,
+    .card-suit {
+      position: absolute;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .card-rank {
+      top: 6px;
+      left: 8px;
+    }
+
+    .card-suit {
+      bottom: 6px;
+      right: 8px;
+      transform: rotate(180deg);
+    }
+
+    .suit-red .card-rank,
+    .suit-red .card-suit {
+      color: #dc2626;
+    }
+
+    .suit-black .card-rank,
+    .suit-black .card-suit {
+      color: #111827;
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ctrl-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      background: #fff;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+    }
+
+    .ctrl-input {
+      width: 72px;
+      height: 36px;
+      text-align: center;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+    }
+
+    .footer {
+      margin-top: 18px;
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+    }
+
+    .navigate-button {
+      width: 220px;
+      height: 46px;
+    }
+
+    @media (max-width: 720px) {
+      .card-pile {
+        width: 92vw;
+      }
+    }
   </style>
 </head>
+
 <body>
   <div class="site-logo">
     <a href="" target="_blank" rel="noopener">
@@ -75,10 +238,42 @@
   </div>
 
   <main class="card" role="main">
+
+    <div class="progress-wrapper">
+
+      <div class="progress-label" data-i18n="step5_progress">
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+      </div>
+
+    </div>
+
     <header class="page-header">
       <h1 id="title" data-i18n="step5_title">Step 5</h1>
-      <p class="lead" id="introText" data-i18n="step5_intro"></p>
+      <!-- <p id="intro" class="lead" data-i18n="step5_intro"></p> -->
     </header>
+
+    <section class="info-box">
+
+      <h3 data-i18n="step5_info_title"></h3>
+
+      <p data-i18n="step5_info_description"></p>
+
+      <div class="info-example">
+
+        <div data-i18n="step5_info_small_difference"></div>
+
+        <div data-i18n="step5_info_large_difference"></div>
+
+      </div>
+
+    </section>
 
     <div class="layout">
       <!-- IZQUIERDA: tablas -->
@@ -140,4 +335,5 @@
   <script src="js/step5.js"></script>
 
 </body>
+
 </html>

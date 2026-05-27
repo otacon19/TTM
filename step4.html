@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TTM - Step 4</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/step4.css" />
   <meta name="theme-color" content="#3498db" />
@@ -31,16 +33,44 @@
 
   <!-- Contenido principal -->
   <main class="card" role="main">
+    <div class="progress-wrapper">
+
+      <div class="progress-label" data-i18n="step4_progress">
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step"></div>
+      </div>
+
+    </div>
     <header class="page-header">
       <h1 id="title" data-i18n="step4r_title"></h1>
-      <p id="intro" class="lead" data-i18n="step4r_intro"></p>
+      <!-- <p id="intro" class="lead" data-i18n="step4r_intro"></p> -->
     </header>
-  
+
+    <section class="info-box">
+
+      <h3 data-i18n="step4_info_title"></h3>
+
+      <p data-i18n="step4_info_description"></p>
+
+      <div class="info-example">
+        <div data-i18n="step4_info_option_accept"></div>
+        <div data-i18n="step4_info_option_reorder"></div>
+        <div data-i18n="step4_info_option_adjust"></div>
+      </div>
+
+    </section>
+
     <div class="step4-layout">
       <!-- Izquierda: RANKING -->
       <section class="panel panel-left" aria-labelledby="rankingTitle">
         <h2 id="rankingTitle" data-i18n="step4r_col_title"></h2>
-  
+
         <div class="rank-scroll">
           <table class="rank-table" id="rankTable">
             <thead>
@@ -55,33 +85,34 @@
           </table>
         </div>
       </section>
-  
+
       <!-- Derecha: PREGUNTAS / CTA -->
       <aside class="panel panel-right sticky-qa" aria-labelledby="qaTitle">
         <h2 id="qaTitle" data-i18n="step4r_title"></h2>
-  
+
         <div class="questions">
           <div class="question">
             <label data-i18n="step4r_q_rank_ok"></label>
             <div class="inline-opts">
               <label><input type="radio" name="rankOk" value="yes"> <span data-i18n="step4r_yes"></span></label>
-              <label><input type="radio" name="rankOk" value="no">  <span data-i18n="step4r_no"></span></label>
+              <label><input type="radio" name="rankOk" value="no"> <span data-i18n="step4r_no"></span></label>
             </div>
             <div id="noteRecompare" class="hint" style="display:none" data-i18n="step4r_logic_note_recompare"></div>
           </div>
-  
+
           <fieldset id="cardsFieldset" class="question">
             <label data-i18n="step4r_q_cards_ok"></label>
             <div class="inline-opts">
               <label><input type="radio" name="cardsOk" value="yes"> <span data-i18n="step4r_yes"></span></label>
-              <label><input type="radio" name="cardsOk" value="no">  <span data-i18n="step4r_no"></span></label>
+              <label><input type="radio" name="cardsOk" value="no"> <span data-i18n="step4r_no"></span></label>
             </div>
-            <div id="noteCardsDisabled" class="hint" style="display:none" data-i18n="step4r_logic_note_cards_disabled"></div>
-             <!-- NUEVA NOTA POR EMPATE -->
+            <div id="noteCardsDisabled" class="hint" style="display:none" data-i18n="step4r_logic_note_cards_disabled">
+            </div>
+            <!-- NUEVA NOTA POR EMPATE -->
             <div id="noteCardsTie" class="hint" style="display:none" data-i18n="step4r_logic_note_tie"></div>
           </fieldset>
         </div>
-  
+
         <div class="actions">
           <button id="continueBtn" class="btn navigate-button" data-i18n="step4r_continue">Continue</button>
         </div>
@@ -93,14 +124,15 @@
   <script src="js/app.js"></script>
   <script type="module">
 
-  import { saveCurrentParticipantResult }
-    from './js/results.js';
+    import { saveCurrentParticipantResult }
+      from './js/results.js';
 
-  window.saveCurrentParticipantResult =
-    saveCurrentParticipantResult;
+    window.saveCurrentParticipantResult =
+      saveCurrentParticipantResult;
 
   </script>
 
-<script src="js/step4.js"></script>
+  <script src="js/step4.js"></script>
 </body>
+
 </html>

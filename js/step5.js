@@ -302,7 +302,7 @@ async function onSave() {
 
 function init() {
     // Intro según flujo elegido
-    document.getElementById('introText').setAttribute('data-i18n', 'step5_intro');
+    //document.getElementById('introText').setAttribute('data-i18n', 'step5_intro');
     if (window.TTM?.refresh) window.TTM.refresh();
 
     const A = generatePR(L);

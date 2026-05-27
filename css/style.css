@@ -266,3 +266,51 @@
   font-size: 0.9rem;
   margin-bottom: 1.5rem;
 }
+
+.progress-wrapper{
+  margin-bottom:1.5rem;
+}
+
+.progress-label{
+  font-size:.95rem;
+  margin-bottom:.45rem;
+  opacity:.8;
+}
+
+.progress-bar{
+  display:flex;
+  gap:.45rem;
+}
+
+.progress-step{
+  flex:1;
+  height:10px;
+  border-radius:999px;
+  background:#d9d9d9;
+}
+
+.progress-step.active{
+  background:#4f46e5;
+}
+
+.info-box{
+  background:#f4f7ff;
+  border:1px solid #d9e2ff;
+  border-radius:14px;
+  padding:1rem 1.2rem;
+  margin-bottom:1.5rem;
+}
+
+.info-box h3{
+  margin-top:0;
+  margin-bottom:.6rem;
+  font-size:1.05rem;
+}
+
+.info-example{
+  margin-top:.8rem;
+  padding:.75rem;
+  border-radius:10px;
+  background:white;
+  font-size:.95rem;
+}

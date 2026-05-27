@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>TTM - Step 3</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Roboto:wght@400;700&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="css/style.css" />
   <link rel="stylesheet" href="css/step3.css" />
   <meta name="theme-color" content="#3498db" />
@@ -28,23 +30,55 @@
   </div>
 
   <main class="card" role="main">
+
+    <div class="progress-wrapper">
+      <div class="progress-label" data-i18n="step3_progress"></div>
+
+      <div class="progress-bar">
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step active"></div>
+        <div class="progress-step"></div>
+        <div class="progress-step"></div>
+      </div>
+    </div>
+
     <header class="page-header">
       <h1 id="title" data-i18n="step3_title"></h1>
     </header>
+
+    <section class="info-box">
+      <h3 data-i18n="step3_info_title"></h3>
+
+      <p data-i18n="step3_info_description"></p>
+
+      <div class="info-example">
+        <strong data-i18n="step3_info_few_cards"></strong>
+        →
+        <span data-i18n="step3_info_few_cards_explanation"></span>
+        <br>
+        <strong data-i18n="step3_info_many_cards"></strong>
+        →
+        <span data-i18n="step3_info_many_cards_explanation"></span>
+      </div>
+    </section>
+
     <p id="description" class="help" data-i18n="step3_description"></p>
-    <p id="choose" class="help" data-i18n="step3_choose_preferred"></p>
+    <!--<p id="choose" class="help" data-i18n="step3_choose_preferred"></p>-->
     <p id="hint" class="help" data-i18n="step3_cards_hint"></p>
 
     <div class="pairs-grid" id="pairsGrid"></div>
 
     <div class="button-row">
       <button id="roundButton" class="btn navigate-button" disabled data-i18n="roundButton_label">Next round</button>
-      <button id="nextButton"  class="btn navigate-button" disabled data-i18n="nextButton_label">Next phase</button>
+      <button id="nextButton" class="btn navigate-button" disabled data-i18n="nextButton_label">Next phase</button>
     </div>
+
   </main>
 
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
   <script src="js/step3.js"></script>
 </body>
+
 </html>

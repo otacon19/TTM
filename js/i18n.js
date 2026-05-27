@@ -105,7 +105,7 @@
       // ======================================================
       // COMMON
       // ======================================================      
-      
+
       back_home: "Back to home",
       back: "Back",
       continue: "Continue",
@@ -132,6 +132,14 @@
       step3_title: "Deck of cards",
       step3_choose_preferred:
         "Choose which object you prefer (left or right). Then add cards to express the differences of attractiveness between the objects. Notice 0 cards does not mean indifference, means the difference between objects is minimal (e.g. equals to one unit).",
+      step3_progress: "Step 3 of 5",
+      step3_info_title: "What are you doing?",
+      step3_info_description:
+        "Choose the object you prefer and use cards to indicate how strong the preference is.",
+      step3_info_few_cards: "Few cards",
+      step3_info_few_cards_explanation: "objects are similar",
+      step3_info_many_cards: "Many cards",
+      step3_info_many_cards_explanation: "objects are very different",
 
       // ======================================================
       // STEP 4
@@ -174,6 +182,34 @@
         "Indicate the ranking of the objects you consider correct by dragging the rows of the table up or down.",
       step4_1_continue_recompare: "Use this ranking",
 
+      step4_progress: "Step 4 of 5",
+
+      step4_info_title: "What are you doing?",
+
+      step4_info_description:
+        "The system computed a ranking and value scale from your comparisons. Review the results and decide whether you want to modify them.",
+
+      step4_info_option_accept:
+        "✔ Accept the ranking if it reflects your preferences",
+
+      step4_info_option_reorder:
+        "✔ Reorder the objects if the ranking is incorrect",
+
+      step4_info_option_adjust:
+        "✔ Adjust the cards if the differences are not accurate",
+
+      step4_1_progress: "Step 4 of 5",
+
+      step4_1_info_title: "What are you doing?",
+
+      step4_1_info_description:
+        "Reorder the objects to indicate the ranking that best reflects your preferences.",
+
+      step4_1_info_drag:
+        "✔ Drag rows up or down to change the ranking",
+
+      step4_1_info_top:
+        "✔ The top object represents your most preferred option",
 
       // ======================================================
       // STEP 5
@@ -193,6 +229,18 @@
         "Here you can adjust the difference of attractiveness between the objects by manipulating the number of cards.",
       step5_continue: "Finish",
       step5_left_accum_header: "Units",
+      step5_progress: "Step 5 of 5",
+
+      step5_info_title: "What are you doing?",
+
+      step5_info_description:
+        "Adjust the number of cards to indicate how different the objects are from each other.",
+
+      step5_info_small_difference:
+        "✔ Few cards → objects are more similar",
+
+      step5_info_large_difference:
+        "✔ Many cards → objects are more different",
 
       // ======================================================
       // GOODBYE
@@ -315,7 +363,7 @@
       // ======================================================
       // STEP 1
       // ======================================================
-     
+
       step1_title: "Número de objetos a comparar",
       step1_description:
         "Introduce el número de objetos a comparar. Puedes escoger entre 3 y 6.",
@@ -323,7 +371,7 @@
       // ======================================================
       // STEP 2
       // ======================================================
-      
+
       step2_title: "Nombre de objetos",
       step2_description: "Introduce el nombre de los objetos.",
 
@@ -331,15 +379,24 @@
       // ======================================================
       // STEP 3
       // ======================================================
-     
+
       step3_title: "Baraja de cartas",
       step3_choose_preferred:
         "Elige el objeto que prefieras (izquierda o derecha). A continuación, añade tarjetas para expresar las diferencias de atractivo entre los objetos. Ten en cuenta que 0 tarjetas no significa indiferencia, sino que la diferencia entre los objetos es mínima (igual a una unidad).",
 
+      step3_progress: "Paso 3 de 5",
+      step3_info_title: "¿Qué está haciendo?",
+      step3_info_description:
+        "Elija el objeto que prefiere y utilice cartas para indicar la intensidad de esa preferencia.",
+      step3_info_few_cards: "Pocas cartas",
+      step3_info_few_cards_explanation: "los objetos son similares",
+      step3_info_many_cards: "Muchas cartas",
+      step3_info_many_cards_explanation: "los objetos son muy diferentes",
+
       // ======================================================
       // STEP 4
       // ======================================================
-      
+
       step4_movies_label: "Objetos",
       step4_movie_placeholder: "Objeto {i}",
 
@@ -379,6 +436,35 @@
       step4r_hint_drag: "Indique cuál es el ranking de los objetos que considera el correcto arrastrando las filas de la tabla arriba o abajo (uno es el mejor).",
       step4_1_continue_recompare: "Usar este ranking",
 
+      step4_progress: "Paso 4 de 5",
+
+      step4_info_title: "¿Qué está haciendo?",
+
+      step4_info_description:
+        "El sistema ha calculado un ranking y una escala de valores a partir de sus comparaciones. Revise los resultados y decida si desea modificarlos.",
+
+      step4_info_option_accept:
+        "✔ Acepte el ranking si refleja sus preferencias",
+
+      step4_info_option_reorder:
+        "✔ Reordene los objetos si el ranking es incorrecto",
+
+      step4_info_option_adjust:
+        "✔ Ajuste las cartas si las diferencias no son adecuadas",
+
+      step4_1_progress: "Paso 4 de 5",
+
+      step4_1_info_title: "¿Qué está haciendo?",
+
+      step4_1_info_description:
+        "Reordene los objetos para indicar el ranking que mejor refleja sus preferencias.",
+
+      step4_1_info_drag:
+        "✔ Arrastre las filas hacia arriba o abajo para cambiar el ranking",
+
+      step4_1_info_top:
+        "✔ El objeto superior representa su opción preferida",
+
       // ======================================================
       // STEP 5
       // ======================================================
@@ -398,6 +484,19 @@
       step5_continue: "Finalizar",
       step5_left_accum_header: "Unidades",
 
+      step5_progress: "Paso 5 de 5",
+
+      step5_info_title: "¿Qué está haciendo?",
+
+      step5_info_description:
+        "Ajuste el número de cartas para indicar cuánto se diferencian los objetos entre sí.",
+
+      step5_info_small_difference:
+        "✔ Pocas cartas → los objetos son más similares",
+
+      step5_info_large_difference:
+        "✔ Muchas cartas → los objetos son más diferentes",
+
       // ======================================================
       // GOODBYE
       // ======================================================
@@ -405,7 +504,7 @@
       goodbye_title: "¡Gracias por usar la herramienta!",
       goodbye_restart: "Volver a empezar",
       goodbye_saved: "Su respuesta se ha guardado correctamente.",
-      
+
     },
   };
 
