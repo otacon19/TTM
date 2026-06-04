@@ -8,6 +8,15 @@ import {
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('joinProblemForm');
     const problemCodeInput = document.getElementById('problemCode');
+
+    const params = new URLSearchParams(window.location.search);
+
+    const codeFromUrl = params.get('code');
+
+    if (codeFromUrl) {
+        problemCodeInput.value = codeFromUrl.toUpperCase();
+    }
+
     const participantNameInput = document.getElementById('participantName');
     const joinError = document.getElementById('joinError');
 

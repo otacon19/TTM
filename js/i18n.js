@@ -56,6 +56,9 @@
       participation_code_title: "Participation code",
       copy_code: "Copy code",
       copied: "Copied!",
+      qr_code_title: "QR code",
+      qr_code_description:
+        "Participants can scan this QR code to access the problem directly.",
 
       // ======================================================
       // ADMIN
@@ -308,6 +311,9 @@
       results_participants_title: "Participantes",
       copy_code: "Copiar código",
       copied: "¡Copiado!",
+      qr_code_title: "Código QR",
+      qr_code_description:
+        "Los participantes pueden escanear este código QR para acceder directamente al problema.",
 
       // ======================================================
       // ADMIN

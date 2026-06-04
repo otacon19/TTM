@@ -41,6 +41,12 @@
       <span id="problemCode"></span>
     </div>
 
+    <h2 data-i18n="qr_code_title"></h2>
+
+    <div id="qrcode" style="margin:20px auto; width:200px;"></div>
+
+    <p data-i18n="qr_code_description"></p>
+
     <h2 data-i18n="creator_code_title"></h2>
     <p data-i18n="creator_code_description"></p>
     <div class="problem-code-box">
@@ -58,6 +64,7 @@
 
   <script src="js/i18n.js"></script>
   <script src="js/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -69,6 +76,19 @@
       }
 
       document.getElementById('problemCode').textContent = problem.code;
+
+      const joinUrl =
+        `${window.location.origin}${window.location.pathname.replace(
+          'problem-created.html',
+          'join.html'
+        )}?code=${encodeURIComponent(problem.code)}`;
+
+      new QRCode(document.getElementById("qrcode"), {
+        text: joinUrl,
+        width: 200,
+        height: 200
+      });
+
       document.getElementById('creatorCode').textContent = problem.creatorCode;
 
     });
