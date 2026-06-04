@@ -43,9 +43,12 @@
 
     <h2 data-i18n="qr_code_title"></h2>
 
-    <div id="qrcode" style="margin:20px auto; width:200px;"></div>
+    <div id="qrcode" class="qr-container"></div>
 
-    <p data-i18n="qr_code_description"></p>
+    <p class="qr-helper-text">
+      <span data-i18n="qr_code_helper"></span>
+      <strong id="qrCodeText"></strong>
+    </p>
 
     <h2 data-i18n="creator_code_title"></h2>
     <p data-i18n="creator_code_description"></p>
@@ -76,6 +79,7 @@
       }
 
       document.getElementById('problemCode').textContent = problem.code;
+      document.getElementById('qrCodeText').textContent = problem.code;
 
       const joinUrl =
         `${window.location.origin}${window.location.pathname.replace(

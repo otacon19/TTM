@@ -56,9 +56,9 @@
       participation_code_title: "Participation code",
       copy_code: "Copy code",
       copied: "Copied!",
-      qr_code_title: "QR code",
-      qr_code_description:
-        "Participants can scan this QR code to access the problem directly.",
+      qr_code_title: "QR for participants",
+      qr_code_helper:
+        "Scan this QR code or share the participation code:",
 
       // ======================================================
       // ADMIN
@@ -114,6 +114,8 @@
       back: "Back",
       evaluate: "Evaluate",
       participant: "Participant",
+      object_legend_title: "Objects legend",
+      object_label: "Object",
 
       // ======================================================
       // STEP 1
@@ -311,9 +313,9 @@
       results_participants_title: "Participantes",
       copy_code: "Copiar código",
       copied: "¡Copiado!",
-      qr_code_title: "Código QR",
-      qr_code_description:
-        "Los participantes pueden escanear este código QR para acceder directamente al problema.",
+      qr_code_title: "QR para participantes",
+      qr_code_helper:
+        "Escanee este código QR o comparta el código de participación:",
 
       // ======================================================
       // ADMIN
@@ -367,6 +369,8 @@
       evaluate: "Evaluar",
       participant: "Participante",
       back: "Volver",
+      object_legend_title: "Leyenda de objetos",
+      object_label: "Objeto",
 
       // ======================================================
       // STEP 1
