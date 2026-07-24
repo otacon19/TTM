@@ -59,7 +59,7 @@
       const spinner = document.getElementById('spinner');
       form.addEventListener('submit', (ev) => {
         ev.preventDefault();
-        const n = Math.max(3, Math.min(6, parseInt(spinner.value || '3', 10)));
+        const n = Math.max(3, Math.min(50, parseInt(spinner.value || '3', 10)));
         localStorage.setItem('n', String(n));
         const nextUrl = form.getAttribute('data-next') || 'step2.html';
         window.location.href = `${nextUrl}?count=${n}`;

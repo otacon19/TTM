@@ -81,7 +81,7 @@ h2 {
 
 /* CARD */
 .card {
-  width: min(880px, 92vw);
+  width: min(1200px, 95vw);
   background: var(--card);
   box-shadow: var(--shadow);
   border-radius: var(--radius);
@@ -393,4 +393,34 @@ header p {
 
 .object-legend-item span {
   overflow-wrap: anywhere;
+}
+
+.text-box-container{
+    display:grid;
+    grid-template-columns: repeat(4, minmax(220px, 1fr));
+
+    gap:12px 20px;
+
+    max-height:60vh;
+    overflow-y:auto;
+
+    padding:4px 12px 4px 4px;
+    box-sizing:border-box;
+}
+
+.text-box-container input{
+    width:100%;
+    box-sizing:border-box;
+}
+
+@media (max-width: 900px) {
+    .text-box-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .text-box-container {
+        grid-template-columns: 1fr;
+    }
 }

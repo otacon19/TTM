@@ -92,6 +92,34 @@
       width: 220px;
       height: 46px;
     }
+
+    /* Contenedor interior donde se insertan los objetos */
+    .object-legend> :last-child {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(180px, 1fr));
+      gap: 8px 20px;
+    }
+
+    /* Cada elemento individual de la leyenda */
+    .object-legend> :last-child>* {
+      min-width: 0;
+    }
+
+    @media (max-width: 1000px) {
+      .object-legend> :last-child {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .object-legend {
+        max-height: 35vh;
+      }
+
+      .object-legend> :last-child {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 

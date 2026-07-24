@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const createButton = document.getElementById('createProblemButton');
 
     function getNumberOfAlternatives() {
-        return Math.max(3, Math.min(6, parseInt(alternativesNumberInput.value || '3', 10)));
+        return Math.max(3, Math.min(50, parseInt(alternativesNumberInput.value || '3', 10)));
     }
 
     function renderAlternativeInputs() {
